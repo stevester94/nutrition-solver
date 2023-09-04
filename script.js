@@ -1,7 +1,8 @@
 // TODO:
 // 2023-09-09:
-//   Gave up at unit conversions. It's not so hard, just tedious. convertUnits is going in the right direction, but need to return the
+//   - Gave up at unit conversions. It's not so hard, just tedious. convertUnits is going in the right direction, but need to return the
 //   conversion factor so subsequent scaling can be done for nutrition
+//   - addIngredient is broken. Adding that list of ingredients breaks. Could be something to do with spaces
 
 class Ingredient_Omnissiah {
     constructor() {
@@ -30,6 +31,7 @@ class Ingredient_Omnissiah {
     getIngredient( id ) {
         return {
             ingredientId: this.ingredients[id].ingredientId,
+            ingredientName: this.ingredients[id].ingredientName,
             quantity: this.ingredients[id].quantity,
             protein: this.ingredients[id].protein,
             calories: this.ingredients[id].calories,
@@ -150,9 +152,17 @@ class Ingredient_Omnissiah {
 
 }
 
-var I_O = new Ingredient_Omnissiah();
-I_O.addIngredient( "chicken1337", "Chicken", "110g", 30, 220 );
 
+
+
+var I_O = new Ingredient_Omnissiah();
+I_O.addIngredient( "chicken", "Chicken", "110g", 30, 220 );
+I_O.addIngredient( "Chobani FF Vanilla", "Chobani FF Vanilla",          "10g", 110, 12 )
+I_O.addIngredient( "1 Scoop Shake w/ Collagen", "1 Scoop Shake w/ Collagen",   "10g", 165, 35 )
+I_O.addIngredient( "Bacon, 2 medium slices", "Bacon, 2 medium slices",      "10g", 86, 6 )
+I_O.addIngredient( "Egg", "Egg",                         "10g", 70, 6 )
+I_O.addIngredient( "1 cup Grated Cheddar", "1 cup Grated Cheddar",        "10g", 480, 24 )
+I_O.addIngredient( "1 cup heavy cream", "1 cup heavy cream",           "10g", 821, 4.9 )
 
 document.addEventListener("DOMContentLoaded", function() {
     // Your initialization code here
@@ -260,10 +270,19 @@ function addIngredient( ingredientId, ingredientName, quantity, calories, protei
     buttonDuplicate.addEventListener("click", function() { ingredientDuplicateHandler(this); });
     cellActions.appendChild( buttonDuplicate );
 
+
     cellIngredientName.textContent = ingredientName;
-    cellQuantity.textContent = quantity;
+
+    const quantityInput = document.createElement("input");
+    quantityInput.type = "text";
+    quantityInput.value = quantity;
+    quantityInput.oninput = function() { ingredientEditHandler(this); }
+    cellQuantity.appendChild( quantityInput )
+
     cellCalories.textContent = calories;
     cellProtein.textContent = protein;
+
+    updateTotals();
 }
 
 
@@ -313,19 +332,18 @@ function updateTotals() {
 // Event listener for input changes
 function searchInputHandler() {
     // Get I_O items here
-    let items = []
-
-    console.log( I_O );
+    let items = [];
 
     const keys = Object.keys(I_O.ingredients);
     keys.forEach(key => {
-        items.push(
-            I_O.ingredients[key].ingredientName
-        );
+        items.push({
+            id: I_O.ingredients[key].ingredientId,
+            name: I_O.ingredients[key].ingredientName
+        });
     });
 
     const inputValue = searchInput.value.toLowerCase();
-    const matchingItems = items.filter(item => item.toLowerCase().includes(inputValue));
+    const matchingItems = items.filter(item => item.name.toLowerCase().includes(inputValue));
     
     // Clear the dropdown
     dropdown.innerHTML = "";
@@ -333,7 +351,8 @@ function searchInputHandler() {
     // Populate the dropdown with matching items
     matchingItems.forEach(item => {
         const listItem = document.createElement("a");
-        listItem.textContent = item;
+        listItem.textContent = item.name;
+        listItem.setAttribute( "ingredientId", item.id )
         dropdown.appendChild(listItem);
     });
 
@@ -347,11 +366,16 @@ function searchInputHandler() {
 
 function searchClickHandler(event) {
     if (event.target.tagName === "A") {
-        let selection = event.target.textContent
-        searchInput.value = selection;
+        let ingredientName = event.target.textContent
+        let ingredientId   = event.target.getAttribute( "ingredientId" )
+        searchInput.value = ingredientName;
         dropdown.style.display = "none";
 
-        addIngredient( selection, selection, "1337ml", 420, 59 )
+        ingredient = I_O.getIngredient( ingredientId );
+
+        console.log( ingredient )
+
+        addIngredient( ingredient.ingredientId, ingredient.ingredientName, ingredient.quantity, ingredient.calories, ingredient.protein );
     }
 }
 
