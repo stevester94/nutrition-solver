@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File API Example</title>
+</head>
+<body>
+    <h1>File API Example</h1>
+    <input type="file" id="fileInput">
+    <pre id="fileContents"></pre>
+
+    <script>
+        // Get references to HTML elements
+        const fileInput = document.getElementById('fileInput');
+        const fileContents = document.getElementById('fileContents');
+
+        // Add an event listener to the file input
+        fileInput.addEventListener('change', function() {
+            const selectedFile = fileInput.files[0];
+
+            if (selectedFile) {
+                // Use FileReader to read the contents of the selected file
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    // Display the contents of the file in a <pre> element
+                    fileContents.textContent = event.target.result;
+                };
+
+                reader.readAsText(selectedFile); // Read file as text
+            } else {
+                fileContents.textContent = 'No file selected.';
+            }
+        });
+    </script>
+</body>
+</html>

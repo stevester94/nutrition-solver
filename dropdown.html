@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Dropdown</title>
+    <style>
+        /* Styles for the search bar and dropdown */
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            width: 100%;
+            border: 1px solid #ddd;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .dropdown-content a {
+            padding: 10px;
+            text-decoration: none;
+            display: block;
+            color: #333;
+        }
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Dropdown Example</h1>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search...">
+        <div class="dropdown-content" id="dropdown">
+            <!-- Matching items will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // Sample list of items to search through
+        const items = ["Apple", "Banana", "Cherry", "Date", "Grapes", "Lemon", "Orange", "Peach", "Pear", "Strawberry"];
+
+        // Get references to HTML elements
+        const searchInput = document.getElementById("searchInput");
+        const dropdown = document.getElementById("dropdown");
+
+        // Event listener for input changes
+        searchInput.addEventListener("input", function() {
+            const inputValue = searchInput.value.toLowerCase();
+            const matchingItems = items.filter(item => item.toLowerCase().includes(inputValue));
+            
+            // Clear the dropdown
+            dropdown.innerHTML = "";
+
+            // Populate the dropdown with matching items
+            matchingItems.forEach(item => {
+                const listItem = document.createElement("a");
+                listItem.textContent = item;
+                dropdown.appendChild(listItem);
+            });
+
+            // Show or hide the dropdown based on matching items
+            if (matchingItems.length > 0) {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none";
+            }
+        });
+
+        // Event listener to handle item selection
+        dropdown.addEventListener("click", function(event) {
+            if (event.target.tagName === "A") {
+                searchInput.value = event.target.textContent;
+                dropdown.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>
