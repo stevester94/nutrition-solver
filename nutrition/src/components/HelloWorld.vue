@@ -1,14 +1,25 @@
 
 
 <template>
+  <v-card-title>
+      Search Ingredients
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Search"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
   <v-data-table
     :headers="headers"
     :items="foodItems"
     :sort-by="[{ key: 'calories', order: 'asc' }]"
+    :search="search"
     class="elevation-1"
   >
     <template v-slot:top>
-      <div class="text-grey">Search Ingredients</div>
       <v-toolbar
         flat
       >
@@ -169,6 +180,7 @@
 
   export default {
     data: () => ({
+      search: '',
       dialog: false,
       dialogDelete: false,
       headers: [
