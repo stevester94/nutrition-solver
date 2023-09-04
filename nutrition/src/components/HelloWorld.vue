@@ -161,10 +161,6 @@
       </v-btn>
     </template>
   </v-data-table>
-  <!--<h1>Calories: {{ sumField('calories') }} </h1>-->
-  <!--<h1>{{ totals }}</h1>
-  <h1>Carbs: {{ totals.carbs }}</h1>
-  <h1>Protein: {{totals.protein }}</h1>-->
   <h1>Calories: {{ this.caloriesSum}}</h1>
   <h1>Protein: {{ this.proteinSum }}</h1>
 </template>
@@ -246,36 +242,6 @@
           
         ]
       },
-      //https://codepen.io/fontzter/pen/BEdKXK
-      /*
-      totals() {
-        console.log('hi you called totals')
-        const totals = this.foodItems.reduce((acc, d) => {
-          acc.calories += d.calories
-          acc.protein += d.protein
-          return acc
-        }, {
-          calories: 0,
-          protein: 0
-        })
-        return totals;
-      },
-      */
-     /*
-     totals() {
-      console.log('you have entered totals')
-      console.log('what the fuck food items is not defined');
-      console.log(this.foodItems);
-      let totals = [];
-      for(let i = 0; i < this.foodItems.length; i++) {
-        this.caloriesSum += this.foodItems[i].calories;
-        this.proteinSum += this.foodItems[i].protein;
-      }
-      totals.push(this.caloriesSum);
-      totals.push(this.proteinSum);
-      return totals;
-     },
-     */
 
       editItem (item) {
         this.editedIndex = this.foodItems.indexOf(item)
