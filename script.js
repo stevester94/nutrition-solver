@@ -5,11 +5,11 @@
 
 class Ingredient_Omnissiah {
     constructor() {
-        self.ingredients = {};
+        this.ingredients = {};
     }
 
     addIngredient( ingredientId, ingredientName, quantity, protein, calories ) {
-        if (self.ingredients.hasOwnProperty(ingredientId)) {
+        if (this.ingredients.hasOwnProperty(ingredientId)) {
             alert("Age property exists in the person object");
             return
         }
@@ -22,17 +22,17 @@ class Ingredient_Omnissiah {
             calories: calories,
         };
 
-        self.ingredients[ingredientId] = newIngredient;
+        this.ingredients[ingredientId] = newIngredient;
 
-        console.log( self.ingredients ) 
+        console.log( this.ingredients ) 
     }
 
     getIngredient( id ) {
         return {
-            ingredientId: self.ingredients[id].ingredientId,
-            quantity: self.ingredients[id].quantity,
-            protein: self.ingredients[id].protein,
-            calories: self.ingredients[id].calories,
+            ingredientId: this.ingredients[id].ingredientId,
+            quantity: this.ingredients[id].quantity,
+            protein: this.ingredients[id].protein,
+            calories: this.ingredients[id].calories,
         }
     }
 
@@ -150,10 +150,12 @@ class Ingredient_Omnissiah {
 
 }
 
+var I_O = new Ingredient_Omnissiah();
+I_O.addIngredient( "chicken1337", "Chicken", "110g", 30, 220 );
+
+
 document.addEventListener("DOMContentLoaded", function() {
     // Your initialization code here
-    const I_O = new Ingredient_Omnissiah();
-    I_O.addIngredient( "chicken1337", "Chicken", "110g", 30, 220 );
 
     console.log( I_O.getIngredient( "chicken1337" ) )
 
@@ -164,6 +166,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     console.log( I_O.getScalarFromQuantity( "1337.24asdf" ) )
     console.log( I_O.getScalarFromQuantity( "asdf" ) )
+
+    // Get references to HTML elements
+    const searchInput = document.getElementById("searchInput");
+    const dropdown = document.getElementById("dropdown");
+
+    // Event listener to handle item selection
+    dropdown.addEventListener("click", searchClickHandler );
+    searchInput.addEventListener("input", searchInputHandler );
+
+    addIngredient( "whatever", "slop", "1337ml", 420, 59 )
 
     // Other initialization tasks
 });
@@ -226,6 +238,34 @@ function ingredientDeleteHandler(element) {
     updateTotals();
 }
 
+function addIngredient( ingredientId, ingredientName, quantity, calories, protein, ) {
+    const table = document.getElementById("ingredientTable");
+
+    const newRow = table.insertRow(table.rows.length);
+
+    newRow.setAttribute( "ingredientId", ingredientId )
+    var cellIngredientName = newRow.insertCell(0);
+    var cellQuantity = newRow.insertCell(1);
+    var cellCalories = newRow.insertCell(2);
+    var cellProtein = newRow.insertCell(3);
+    var cellActions = newRow.insertCell(4);
+
+    const buttonDelete = document.createElement("button");
+    buttonDelete.textContent = "Delete";
+    buttonDelete.addEventListener("click", function() { ingredientDeleteHandler(this); });
+    cellActions.appendChild( buttonDelete );
+
+    const buttonDuplicate = document.createElement("button");
+    buttonDuplicate.textContent = "Duplicate";
+    buttonDuplicate.addEventListener("click", function() { ingredientDuplicateHandler(this); });
+    cellActions.appendChild( buttonDuplicate );
+
+    cellIngredientName.textContent = ingredientName;
+    cellQuantity.textContent = quantity;
+    cellCalories.textContent = calories;
+    cellProtein.textContent = protein;
+}
+
 
 function ingredientDuplicateHandler(element) {
     const row = element.closest("tr");
@@ -268,3 +308,50 @@ function updateTotals() {
 
     console.log( caloriesTotal, proteinTotal, caloriesBox )
 }
+
+
+// Event listener for input changes
+function searchInputHandler() {
+    // Get I_O items here
+    let items = []
+
+    console.log( I_O );
+
+    const keys = Object.keys(I_O.ingredients);
+    keys.forEach(key => {
+        items.push(
+            I_O.ingredients[key].ingredientName
+        );
+    });
+
+    const inputValue = searchInput.value.toLowerCase();
+    const matchingItems = items.filter(item => item.toLowerCase().includes(inputValue));
+    
+    // Clear the dropdown
+    dropdown.innerHTML = "";
+
+    // Populate the dropdown with matching items
+    matchingItems.forEach(item => {
+        const listItem = document.createElement("a");
+        listItem.textContent = item;
+        dropdown.appendChild(listItem);
+    });
+
+    // Show or hide the dropdown based on matching items
+    if (matchingItems.length > 0) {
+        dropdown.style.display = "block";
+    } else {
+        dropdown.style.display = "none";
+    }
+}
+
+function searchClickHandler(event) {
+    if (event.target.tagName === "A") {
+        let selection = event.target.textContent
+        searchInput.value = selection;
+        dropdown.style.display = "none";
+
+        addIngredient( selection, selection, "1337ml", 420, 59 )
+    }
+}
+
