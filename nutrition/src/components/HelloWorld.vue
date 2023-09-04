@@ -3,11 +3,12 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="desserts"
+    :items="foodItems"
     :sort-by="[{ key: 'calories', order: 'asc' }]"
     class="elevation-1"
   >
     <template v-slot:top>
+      <div class="text-grey">Search Ingredients</div>
       <v-toolbar
         flat
       >
@@ -160,6 +161,12 @@
       </v-btn>
     </template>
   </v-data-table>
+  <!--<h1>Calories: {{ sumField('calories') }} </h1>-->
+  <!--<h1>{{ totals }}</h1>
+  <h1>Carbs: {{ totals.carbs }}</h1>
+  <h1>Protein: {{totals.protein }}</h1>-->
+  <h1>Calories: {{ this.caloriesSum}}</h1>
+  <h1>Protein: {{ this.proteinSum }}</h1>
 </template>
 
 <script>
@@ -176,12 +183,13 @@
           key: 'name',
         },
         { title: 'Quantity', key: 'quantity' },
+        { title: 'Calories', key: 'calories' },
         { title: 'Fat (g)', key: 'fat' },
         { title: 'Carbs (g)', key: 'carbs' },
         { title: 'Protein (g)', key: 'protein' },
         { title: 'Actions', key: 'actions', sortable: false },
       ],
-      desserts: [],
+      foodItems: [],
       editedIndex: -1,
       editedItem: {
         name: '',
@@ -199,6 +207,8 @@
         carbs: 0,
         protein: 0,
       },
+      caloriesSum: 335,
+      proteinSum: 38,
     }),
 
     computed: {
@@ -222,7 +232,9 @@
 
     methods: {
       initialize () {
-        this.desserts = [
+        this.caloriesSum = 335;
+        this.proteinSum = 38;
+        this.foodItems = [
           {
             name: 'Chicken',
             quantity: 140,
@@ -234,21 +246,53 @@
           
         ]
       },
+      //https://codepen.io/fontzter/pen/BEdKXK
+      /*
+      totals() {
+        console.log('hi you called totals')
+        const totals = this.foodItems.reduce((acc, d) => {
+          acc.calories += d.calories
+          acc.protein += d.protein
+          return acc
+        }, {
+          calories: 0,
+          protein: 0
+        })
+        return totals;
+      },
+      */
+     /*
+     totals() {
+      console.log('you have entered totals')
+      console.log('what the fuck food items is not defined');
+      console.log(this.foodItems);
+      let totals = [];
+      for(let i = 0; i < this.foodItems.length; i++) {
+        this.caloriesSum += this.foodItems[i].calories;
+        this.proteinSum += this.foodItems[i].protein;
+      }
+      totals.push(this.caloriesSum);
+      totals.push(this.proteinSum);
+      return totals;
+     },
+     */
 
       editItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+        this.editedIndex = this.foodItems.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+        this.editedIndex = this.foodItems.indexOf(item)
         this.editedItem = Object.assign({}, item)
+        this.caloriesSum -= parseInt(item.calories);
+        this.proteinSum -= parseInt(item.protein);
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.desserts.splice(this.editedIndex, 1)
+        this.foodItems.splice(this.editedIndex, 1)
         this.closeDelete()
       },
 
@@ -270,10 +314,12 @@
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          Object.assign(this.foodItems[this.editedIndex], this.editedItem)
         } else {
-          this.desserts.push(this.editedItem)
+          this.foodItems.push(this.editedItem)
         }
+        this.caloriesSum += parseInt(this.editedItem.calories);
+        this.proteinSum += parseInt(this.editedItem.protein);
         this.close()
       },
     },
