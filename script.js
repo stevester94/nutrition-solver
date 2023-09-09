@@ -32,7 +32,7 @@ class Quantity {
         // ]
 
         // Match a potential decimal scalar, potential unlimited spaces, then text suffix
-        let reg = /(\d+\.?\d*)\s*(.*)/
+        let reg = /(\d+\.?\d*)\s*(.+)/
         let matches = str.match( reg )
         if( matches === null ) {
             this.value = null;
@@ -55,6 +55,13 @@ class Quantity {
         let volumeUnits = [ "ml", "l", "tbsp", "tsp" ]
 
         return volumeUnits.includes( unit );
+    }
+
+    // The ratio from this is used to scale the original ingredient
+    getQuantityRatio( otherQuantity ) {
+        let tempQ = this.convertQuantity( otherQuantity.unit );
+        console.log( tempQ )
+        return otherQuantity.value / tempQ.value;
     }
 
     convertQuantity( newUnit ) {
@@ -97,7 +104,7 @@ class Quantity {
 
             let newQ = new Quantity();
             newQ.fromVals( this.value*scaleFactor, newUnit );
-            return [ newQ, scaleFactor ];
+            return newQ
         }
 
         else if( thisUnitType == "volume" ) {
@@ -119,14 +126,67 @@ class Quantity {
 
             let newQ = new Quantity();
             newQ.fromVals( this.value*scaleFactor, newUnit );
-            return [ newQ, scaleFactor ];
+            return newQ
         }
         else if( thisUnitType == "custom") {
             let newQ = new Quantity();
             newQ.fromVals( this.value, newUnit );
-            return [ newQ, 1.0 ];
+            return newQ
         }
     }
+}
+
+function assert( muhBool ) {
+    if( ! muhBool ) {
+        throw new Error( "Bad assert" );
+    }
+}
+
+function assertFloatsAlmostEqual(a, b, epsilon = 0.001) {
+    if (Math.abs(a - b) > epsilon) {
+      throw new Error(`Assertion failed: ${a} is not approximately equal to ${b}`);
+    }
+  }
+
+function testQuantityClass() {
+    // Basic quantity conversions
+    var q1 = new Quantity();
+    q1.fromStr( "2.3 kg" )
+    var q2 = new Quantity();
+    q2.fromStr( "2.3 lb" )
+    assertFloatsAlmostEqual( q1.getQuantityRatio( q2 ), 0.453592 )
+
+    q1.fromStr( "10 scoops" )
+    q2.fromStr( "10 scoops" )
+    assertFloatsAlmostEqual( q1.getQuantityRatio( q2 ), 1.0 )
+
+    q1.fromStr( "10 scoops" )
+    q2.fromStr( "5 scoops" )
+    assertFloatsAlmostEqual( q1.getQuantityRatio( q2 ), 0.5 )
+
+    q1.fromStr( "1 scoops" )
+    q2.fromStr( "5 scoops" )
+    assertFloatsAlmostEqual( q1.getQuantityRatio( q2 ), 5 )
+
+    q1.fromStr( "2.3 lb" )
+    q2.fromStr( "2.3 kg" )
+    assertFloatsAlmostEqual( q1.getQuantityRatio( q2 ), 1.0/0.453592 )
+
+    
+    // Check '5' throws error
+    let error;
+    try { error = false; q2.fromStr( "5" ) }
+    catch { error = true; }
+    finally { assert( error ) }
+    
+    // 5 fug is valid
+    try { error = false; q2.fromStr( "5fug" ); }
+    catch { error = true; }
+    finally { assert( !error ) }
+
+    try { error = false; q2.fromStr( "5 fug" ); }
+    catch { error = true; }
+    finally { assert( !error ) }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -155,13 +215,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Other initialization tasks
 
 
-    var q1 = new Quantity();
-    q1.fromStr( "2.3 kg" )
-    console.log(q1)
-
-    // q2.convertQuantity( "tbsp" )
-    newQ = q1.convertQuantity( "lb" )
-    console.log( newQ[0], newQ[1] )
+    testQuantityClass()
 });
 
 class Ingredient_Omnissiah {
