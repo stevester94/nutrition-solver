@@ -76,7 +76,6 @@ class Quantity {
     // The ratio from this is used to scale the original ingredient
     getQuantityRatio( otherQuantity ) {
         let tempQ = this.convertQuantity( otherQuantity.unit );
-        console.log( tempQ )
         return otherQuantity.value / tempQ.value;
     }
 
@@ -226,8 +225,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // const dropdown = document.getElementById("dropdown");
 
     // // Event listener to handle item selection
-    // dropdown.addEventListener("click", searchClickHandler );
-    // searchInput.addEventListener("input", searchInputHandler );
+    dropdown.addEventListener("click", searchClickHandler );
+    searchInput.addEventListener("input", searchInputHandler );
 
     // addIngredient( "whatever", "slop", "1337ml", 420, 59 )
 
@@ -284,7 +283,7 @@ class Ingredient_Omnissiah {
 var I_O = new Ingredient_Omnissiah();
 I_O.addIngredient( "Chicken",                   Quantity.fromStr("110g"), 220, 30 );
 I_O.addIngredient( "Chobani FF Vanilla",        Quantity.fromStr("10 g"), 110, 12 )
-I_O.addIngredient( "1 Scoop Shake w/ Collagen", Quantity.fromStr("10   g"), 165, 35 )
+I_O.addIngredient( "1 Scoop Shake w/ Collagen", Quantity.fromStr("1 scoop"), 165, 35 )
 I_O.addIngredient( "Bacon, 2 medium slices",    Quantity.fromStr("10 g"), 86, 6 )
 I_O.addIngredient( "Egg",                       Quantity.fromStr("10  g"), 70, 6 )
 I_O.addIngredient( "1 cup Grated Cheddar",      Quantity.fromStr("10g"), 480, 24 )
@@ -295,51 +294,28 @@ console.log(
 )
 
 
-
-// // Function to add a new task to the list
-// function addItem() {
-//     const newItemText = document.getElementById("newItem").value;
-//     if (newItemText.trim() !== "") {
-//         const taskList = document.getElementById("taskList");
-//         const listItem = document.createElement("li");
-//         listItem.innerHTML = `<input type="checkbox" onclick="completeItem(this)"> ${newItemText} <button onclick="removeItem(this)">Remove</button>`;
-//         taskList.appendChild(listItem);
-//         document.getElementById("newItem").value = ""; // Clear the input field
-//     }
-// }
-
-// // Function to mark a task as complete
-// function completeItem(checkbox) {
-//     const listItem = checkbox.parentElement;
-//     if (checkbox.checked) {
-//         listItem.style.textDecoration = "line-through";
-//     } else {
-//         listItem.style.textDecoration = "none";
-//     }
-// }
-
-// // Function to remove a task from the list
-// function removeItem(button) {
-//     const listItem = button.parentElement;
-//     const taskList = document.getElementById("taskList");
-//     taskList.removeChild(listItem);
-// }
-
-
 function quantityEditHandler(element) {
     const row = element.closest("tr");
     const table = element.closest("table");
 
     const quantityValue  = element.value;
     const elementId  = element.id;
-    const ingredientId  = row.getAttribute("ingredientId"); // Custom attributes have to be fetched like this apparently
 
     var cellIngredientName = row.cells[0];
     var cellQuantity = row.cells[1];
     var cellCalories = row.cells[2];
     var cellProtein = row.cells[3];
 
-    cellCalories.textContent = String(parseFloat(cellCalories.textContent) * 2);
+    let quant = null;
+    try {
+        quant = Quantity.fromStr( cellQuantity.querySelector('input').value );
+        let scaledIngredient = I_O.scaleIngredient( cellIngredientName.textContent, quant )
+        cellCalories.textContent = String(parseFloat(scaledIngredient.calories));
+        cellProtein.textContent = String(parseFloat(scaledIngredient.protein));
+    }
+    catch( error ) {
+        // TODO: Make the cell red or something
+    }
 
     updateTotals();
 }
@@ -353,12 +329,11 @@ function ingredientDeleteHandler(element) {
     updateTotals();
 }
 
-function addIngredient( ingredientId, ingredientName, quantity, calories, protein, ) {
+function addIngredient( ingredientName, quantity, calories, protein, ) {
     const table = document.getElementById("ingredientTable");
 
     const newRow = table.insertRow(table.rows.length);
 
-    newRow.setAttribute( "ingredientId", ingredientId )
     var cellIngredientName = newRow.insertCell(0);
     var cellQuantity = newRow.insertCell(1);
     var cellCalories = newRow.insertCell(2);
@@ -380,7 +355,7 @@ function addIngredient( ingredientId, ingredientName, quantity, calories, protei
 
     const quantityInput = document.createElement("input");
     quantityInput.type = "text";
-    quantityInput.value = quantity;
+    quantityInput.value = quantity.toStr();
     quantityInput.oninput = function() { quantityEditHandler(this); }
     cellQuantity.appendChild( quantityInput )
 
@@ -420,8 +395,6 @@ function updateTotals() {
         var cellCalories = row.cells[2];
         var cellProtein = row.cells[3];
 
-        console.log( rows )
-
         caloriesTotal += parseFloat(cellCalories.textContent);
         proteinTotal += parseFloat(cellProtein.textContent);
     }
@@ -429,26 +402,16 @@ function updateTotals() {
 
     caloriesBox.textContent = String(caloriesTotal);
     proteinBox.textContent = String(proteinTotal);
-
-    console.log( caloriesTotal, proteinTotal, caloriesBox )
 }
 
 
 // Event listener for input changes
 function searchInputHandler() {
     // Get I_O items here
-    let items = [];
-
-    const keys = Object.keys(I_O.ingredients);
-    keys.forEach(key => {
-        items.push({
-            id: I_O.ingredients[key].ingredientId,
-            name: I_O.ingredients[key].ingredientName
-        });
-    });
+    let items = Array.from( I_O.ingredients.keys() );
 
     const inputValue = searchInput.value.toLowerCase();
-    const matchingItems = items.filter(item => item.name.toLowerCase().includes(inputValue));
+    const matchingItems = items.filter(item => item.toLowerCase().includes(inputValue));
     
     // Clear the dropdown
     dropdown.innerHTML = "";
@@ -456,8 +419,7 @@ function searchInputHandler() {
     // Populate the dropdown with matching items
     matchingItems.forEach(item => {
         const listItem = document.createElement("a");
-        listItem.textContent = item.name;
-        listItem.setAttribute( "ingredientId", item.id )
+        listItem.textContent = item;
         dropdown.appendChild(listItem);
     });
 
@@ -472,15 +434,12 @@ function searchInputHandler() {
 function searchClickHandler(event) {
     if (event.target.tagName === "A") {
         let ingredientName = event.target.textContent
-        let ingredientId   = event.target.getAttribute( "ingredientId" )
         searchInput.value = ingredientName;
         dropdown.style.display = "none";
 
-        ingredient = I_O.getIngredient( ingredientId );
+        ingredient = I_O.getIngredient( ingredientName );
 
-        console.log( ingredient )
-
-        addIngredient( ingredient.ingredientId, ingredient.ingredientName, ingredient.quantity, ingredient.calories, ingredient.protein );
+        addIngredient( ingredient.ingredientName, ingredient.quantity, ingredient.calories, ingredient.protein );
     }
 }
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple To-Do List</title>
+    <title>Nutrition Solver</title>
     <script src="script.js"></script>
     <style>
         /* Styles for the search bar and dropdown */
@@ -51,19 +51,6 @@
             <th>Protein</th>
             <th>Actions</th>
             
-        </tr>
-        <tr ingredientId="muh-chicken">
-            <td>Chicken</td>
-            <td>
-                <!-- `this` passes the calling element to the handler -->
-                <input type="text" id="editableField" value="110g" oninput="quantityEditHandler(this)">
-            </td>
-            <td>220</td>
-            <td>30</td>
-            <td>
-                <button onclick="ingredientDeleteHandler(this)">Delete</button>
-                <button onclick="ingredientDuplicateHandler(this)">Duplicate</button>
-            </td>
         </tr>
     </table>
 
