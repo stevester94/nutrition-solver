@@ -253,8 +253,6 @@ class Ingredient_Omnissiah {
             calories: calories,
         };
 
-        console.log( newIngredient )
-
         this.ingredients.set(ingredientName, newIngredient);
     }
 
@@ -309,6 +307,7 @@ function quantityEditHandler(element) {
     let quant = null;
     try {
         quant = Quantity.fromStr( cellQuantity.querySelector('input').value );
+        console.log( "Parsed quantity: ", quant )
         let scaledIngredient = I_O.scaleIngredient( cellIngredientName.textContent, quant )
         cellCalories.textContent = String(parseFloat(scaledIngredient.calories));
         cellProtein.textContent = String(parseFloat(scaledIngredient.protein));
