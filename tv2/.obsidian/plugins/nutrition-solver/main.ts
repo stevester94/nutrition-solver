@@ -10,8 +10,119 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
     mySetting: 'default'
 }
 
+
+
+/*
+EXAMPLES
+https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/master/src/main.ts#L2318
+  private switchToExcalidarwAfterLoad() {
+    const self = this;
+    this.app.workspace.onLayoutReady(() => {
+      let leaf: WorkspaceLeaf;
+      for (leaf of app.workspace.getLeavesOfType("markdown")) {
+        if (
+          leaf.view instanceof MarkdownView &&
+          self.isExcalidrawFile(leaf.view.file)
+        ) {
+          self.excalidrawFileModes[(leaf as any).id || leaf.view.file.path] =
+            VIEW_TYPE_EXCALIDRAW;
+          self.setExcalidrawView(leaf);
+        }
+      }
+    });
+  }
+
+  public async setExcalidrawView(leaf: WorkspaceLeaf) {
+    await leaf.setViewState({
+      type: VIEW_TYPE_EXCALIDRAW,
+      state: leaf.view.getState(),
+      popstate: true,
+    } as ViewState);
+  }
+
+  public isExcalidrawFile(f: TFile) {
+    if(!f) return false;
+    if (f.extension === "excalidraw") {
+      return true;
+    }
+    const fileCache = f ? this.app.metadataCache.getFileCache(f) : null;
+    return !!fileCache?.frontmatter && !!fileCache.frontmatter[FRONTMATTER_KEY];
+  }
+
+/////////////////////////////////
+// START HERE
+/////////////////////////////////
+
+    this.addRibbonIcon(ICON_NAME, t("CREATE_NEW"), async (e) => {
+        this.createAndOpenDrawing(
+        getDrawingFilename(this.settings),
+        linkClickModifierType(emulateCTRLClickForLinks(e)), // SMACK: Something like "new-tab";
+        ); 
+    });
+
+
+  public async createAndOpenDrawing(
+    filename: string,
+    location: PaneTarget,
+    foldername?: string,
+    initData?: string,
+  ): Promise<string> {
+    const file = await this.createDrawing(filename, foldername, initData);
+    this.openDrawing(file, location, true, undefined, true);
+    return file.path;
+  }
+
+  public openDrawing(
+    drawingFile: TFile,
+    location: PaneTarget,
+    active: boolean = false,
+    subpath?: string,
+    justCreated: boolean = false
+  ) {
+    if(location === "md-properties") {
+      location = "new-tab";
+    }
+    let leaf: WorkspaceLeaf;
+    if(location === "popout-window") {
+      leaf = app.workspace.openPopoutLeaf();
+    }
+    if(location === "new-tab") {
+      leaf = app.workspace.getLeaf('tab');
+    }
+    if(!leaf) {
+      leaf = this.app.workspace.getLeaf(false);
+      if ((leaf.view.getViewType() !== 'empty') && (location === "new-pane")) {
+        leaf = getNewOrAdjacentLeaf(this, leaf)    
+      }
+    }
+
+    leaf.openFile(
+      drawingFile, 
+      !subpath || subpath === "" 
+        ? {active}
+        : { active, eState: { subpath } }
+    ).then(()=>{
+      if(justCreated && this.ea.onFileCreateHook) {
+        try {
+          this.ea.onFileCreateHook({
+            ea: this.ea,
+            excalidrawFile: drawingFile,
+            view: leaf.view as ExcalidrawView,
+          });
+        } catch(e) {
+          console.error(e);
+        }
+      }
+    })
+  }
+
+
+
+*/
+
 export default class MyPlugin extends Plugin {
     settings: MyPluginSettings;
+    private view: ExampleView;
 
     async onload() {
         await this.loadSettings();
@@ -24,10 +135,11 @@ export default class MyPlugin extends Plugin {
 
         this.registerView(
             VIEW_TYPE_EXAMPLE,
-            (leaf) => new ExampleView(leaf)
-          );
-      
-        this.addRibbonIcon("dice", "Activate view", () => {
+            (leaf: WorkspaceLeaf) => (this.view = new ExampleView(leaf))
+        );
+    
+        this.addRibbonIcon("dice", "Activate view", (e) => {
+            console.log( "FUCK", e );
             this.activateView();
         });
 
@@ -55,6 +167,7 @@ export default class MyPlugin extends Plugin {
                 editor.replaceSelection('Sample Editor Command');
             }
         });
+
         // This adds a complex command that can check whether the current state of the app allows execution of the command
         this.addCommand({
             id: 'open-sample-modal-complex',
@@ -94,16 +207,25 @@ export default class MyPlugin extends Plugin {
     }
   
     async activateView() {
-      this.app.workspace.detachLeavesOfType(VIEW_TYPE_EXAMPLE);
-  
-      await this.app.workspace.getRightLeaf(false).setViewState({
-        type: VIEW_TYPE_EXAMPLE,
-        active: true,
-      });
-  
-      this.app.workspace.revealLeaf(
-        this.app.workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE)[0]
-      );
+        let leaf: WorkspaceLeaf;
+        leaf = this.app.workspace.getLeaf('tab');
+
+        // this.app.workspace.detachLeavesOfType(VIEW_TYPE_EXAMPLE);
+
+
+        // await this.app.workspace.getRightLeaf(false).setViewState({
+        // type: VIEW_TYPE_EXAMPLE,
+        // active: true,
+        // });
+
+        await leaf.setViewState({
+            type: VIEW_TYPE_EXAMPLE,
+            active: true,
+        });
+
+        // this.app.workspace.revealLeaf(
+        //     this.app.workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE)[0]
+        // );
     }
 
     async loadSettings() {
@@ -171,13 +293,13 @@ export class ExampleView extends ItemView {
   }
 
   getDisplayText() {
-    return "Example view";
+    return "New fucking tab!";
   }
 
   async onOpen() {
     const container = this.containerEl.children[1];
     container.empty();
-    container.createEl("h4", { text: "Example view" });
+    container.createEl("h4", { text: "Well I'll be a son of a bitch" });
   }
 
   async onClose() {

@@ -21,14 +21,22 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Untitled.md",
+                "file": "note1.md",
                 "mode": "source",
                 "source": false
               }
             }
+          },
+          {
+            "id": "f900bd7cc78f34ce",
+            "type": "leaf",
+            "state": {
+              "type": "example-view",
+              "state": {}
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -94,7 +102,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Untitled.md",
+                "file": "note1.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -111,7 +119,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Untitled.md",
+                "file": "note1.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -134,12 +142,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Untitled.md"
+                "file": "note1.md"
               }
             }
           },
           {
-            "id": "2392f3e65bbc6d6c",
+            "id": "7bbc8202e7905693",
             "type": "leaf",
             "state": {
               "type": "example-view",
@@ -165,10 +173,10 @@
       "nutrition-solver:Activate view": false
     }
   },
-  "active": "7f65c7ea2719dc55",
+  "active": "f900bd7cc78f34ce",
   "lastOpenFiles": [
-    "note1.md",
     "Untitled.md",
+    "note1.md",
     "Untitled"
   ]
 }
