@@ -17,6 +17,22 @@ class Quantity {
         this.unit  = unit;
     }
 
+    toStr() {
+        return String(this.value) + " " + this.unit;
+    }
+
+    static fromVals( value, unit ) {
+        let q = new Quantity();
+        q.fromVals( value, unit );
+        return q;
+    }
+
+    static fromStr( s ) {
+        let q = new Quantity();
+        q.fromStr( s );
+        return q;
+    }
+
     fromStr( str ) {
         // Get the units of a str (Just look at the suffix)
 
@@ -187,6 +203,9 @@ function testQuantityClass() {
     try { error = false; q2.fromStr( "5 fug" ); }
     catch { error = true; }
     finally { assert( !error ) }
+
+    q1.fromStr( "2.3perflunks" )
+    assert( q1.toStr() === "2.3 perflunks" );
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -220,53 +239,42 @@ document.addEventListener("DOMContentLoaded", function() {
 
 class Ingredient_Omnissiah {
     constructor() {
-        this.ingredients = {};
+        this.ingredients = new Map();
     }
 
-    addIngredient( ingredientId, ingredientName, quantity, protein, calories ) {
-        if (this.ingredients.hasOwnProperty(ingredientId)) {
-            alert("Age property exists in the person object");
-            return
+    addIngredient( ingredientName, quantity, calories, protein ) {
+        if (this.ingredients.has(ingredientName)) {
+            throw new Error( `${ingredientName} already exists in Ingredient_Omnissiah` )
         }
 
         var newIngredient = {
-            ingredientId: ingredientId,
             ingredientName: ingredientName,
             quantity: quantity,
             protein: protein,
             calories: calories,
         };
 
-        this.ingredients[ingredientId] = newIngredient;
+        console.log( newIngredient )
 
-        console.log( this.ingredients ) 
+        this.ingredients.set(ingredientName, newIngredient);
     }
 
-    getIngredient( id ) {
-        return {
-            ingredientId: this.ingredients[id].ingredientId,
-            ingredientName: this.ingredients[id].ingredientName,
-            quantity: this.ingredients[id].quantity,
-            protein: this.ingredients[id].protein,
-            calories: this.ingredients[id].calories,
-        }
+    getIngredient( name ) {
+        return this.ingredients.get( name );
     }
 
-    getQuantityIngredient( id, quantity ) {
-        let ingredient = this.getIngredient( id );
-        let originalUnit = this.getUnit( ingredient.quantity );
-        let newUnit = this.getUnit( quantity );
+    scaleIngredient( name, newQuantity ) {
+        let ingredient = this.ingredients.get( name );
+        let ratio = ingredient.quantity.getQuantityRatio( newQuantity );
 
-        let scalarQuantity = this.getScalarFromQuantity( quantity );
-        if( scalarQuantity === null ) {
-            return null;
-        }
+        // The absolute state of this shitty fucking language
+        var scaled = JSON.parse(JSON.stringify(ingredient));
 
-        ingredient.quantity = convertUnits( originalUnit, newUnit, scalarQuantity );
+        scaled.quantity = newQuantity;
+        scaled.protein *= ratio;
+        scaled.calories *= ratio;
 
-
-
-
+        return scaled;
     }
 }
 
@@ -274,48 +282,51 @@ class Ingredient_Omnissiah {
 
 
 var I_O = new Ingredient_Omnissiah();
-// I_O.addIngredient( "chicken", "Chicken", "110g", 30, 220 );
-// I_O.addIngredient( "Chobani FF Vanilla", "Chobani FF Vanilla",          "10g", 110, 12 )
-// I_O.addIngredient( "1 Scoop Shake w/ Collagen", "1 Scoop Shake w/ Collagen",   "10g", 165, 35 )
-// I_O.addIngredient( "Bacon, 2 medium slices", "Bacon, 2 medium slices",      "10g", 86, 6 )
-// I_O.addIngredient( "Egg", "Egg",                         "10g", 70, 6 )
-// I_O.addIngredient( "1 cup Grated Cheddar", "1 cup Grated Cheddar",        "10g", 480, 24 )
-// I_O.addIngredient( "1 cup heavy cream", "1 cup heavy cream",           "10g", 821, 4.9 )
+I_O.addIngredient( "Chicken",                   Quantity.fromStr("110g"), 220, 30 );
+I_O.addIngredient( "Chobani FF Vanilla",        Quantity.fromStr("10 g"), 110, 12 )
+I_O.addIngredient( "1 Scoop Shake w/ Collagen", Quantity.fromStr("10   g"), 165, 35 )
+I_O.addIngredient( "Bacon, 2 medium slices",    Quantity.fromStr("10 g"), 86, 6 )
+I_O.addIngredient( "Egg",                       Quantity.fromStr("10  g"), 70, 6 )
+I_O.addIngredient( "1 cup Grated Cheddar",      Quantity.fromStr("10g"), 480, 24 )
+I_O.addIngredient( "1 cup heavy cream",         Quantity.fromStr("10g"), 821, 4.9 )
+
+console.log(
+    I_O.scaleIngredient( "Egg", Quantity.fromStr("100g") )
+)
 
 
 
+// // Function to add a new task to the list
+// function addItem() {
+//     const newItemText = document.getElementById("newItem").value;
+//     if (newItemText.trim() !== "") {
+//         const taskList = document.getElementById("taskList");
+//         const listItem = document.createElement("li");
+//         listItem.innerHTML = `<input type="checkbox" onclick="completeItem(this)"> ${newItemText} <button onclick="removeItem(this)">Remove</button>`;
+//         taskList.appendChild(listItem);
+//         document.getElementById("newItem").value = ""; // Clear the input field
+//     }
+// }
 
-// Function to add a new task to the list
-function addItem() {
-    const newItemText = document.getElementById("newItem").value;
-    if (newItemText.trim() !== "") {
-        const taskList = document.getElementById("taskList");
-        const listItem = document.createElement("li");
-        listItem.innerHTML = `<input type="checkbox" onclick="completeItem(this)"> ${newItemText} <button onclick="removeItem(this)">Remove</button>`;
-        taskList.appendChild(listItem);
-        document.getElementById("newItem").value = ""; // Clear the input field
-    }
-}
+// // Function to mark a task as complete
+// function completeItem(checkbox) {
+//     const listItem = checkbox.parentElement;
+//     if (checkbox.checked) {
+//         listItem.style.textDecoration = "line-through";
+//     } else {
+//         listItem.style.textDecoration = "none";
+//     }
+// }
 
-// Function to mark a task as complete
-function completeItem(checkbox) {
-    const listItem = checkbox.parentElement;
-    if (checkbox.checked) {
-        listItem.style.textDecoration = "line-through";
-    } else {
-        listItem.style.textDecoration = "none";
-    }
-}
-
-// Function to remove a task from the list
-function removeItem(button) {
-    const listItem = button.parentElement;
-    const taskList = document.getElementById("taskList");
-    taskList.removeChild(listItem);
-}
+// // Function to remove a task from the list
+// function removeItem(button) {
+//     const listItem = button.parentElement;
+//     const taskList = document.getElementById("taskList");
+//     taskList.removeChild(listItem);
+// }
 
 
-function ingredientEditHandler(element) {
+function quantityEditHandler(element) {
     const row = element.closest("tr");
     const table = element.closest("table");
 
@@ -370,7 +381,7 @@ function addIngredient( ingredientId, ingredientName, quantity, calories, protei
     const quantityInput = document.createElement("input");
     quantityInput.type = "text";
     quantityInput.value = quantity;
-    quantityInput.oninput = function() { ingredientEditHandler(this); }
+    quantityInput.oninput = function() { quantityEditHandler(this); }
     cellQuantity.appendChild( quantityInput )
 
     cellCalories.textContent = calories;
