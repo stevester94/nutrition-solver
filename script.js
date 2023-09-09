@@ -369,11 +369,18 @@ function ingredientDuplicateHandler(element) {
     const row = element.closest("tr");
     const table = element.closest("table");
 
-    const deepClone = row.cloneNode(true);
+    var cellIngredientName = row.cells[0];
+    var cellQuantity = row.cells[1];
+    var cellCalories = row.cells[2];
+    var cellProtein = row.cells[3];
 
-    table.appendChild( deepClone );
+    let name = cellIngredientName.textContent;
+    let quant = Quantity.fromStr( cellQuantity.querySelector('input').value );
+    let calories = parseFloat(cellCalories.textContent);
+    let protein  = parseFloat(cellProtein.textContent);
 
-    updateTotals();
+    addIngredient( name,quant,calories,protein );
+    // addIngredient( ingredient.ingredientName, ingredient.quantity, ingredient.calories, ingredient.protein );
 }
 
 function updateTotals() {
