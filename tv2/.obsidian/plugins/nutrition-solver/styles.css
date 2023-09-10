@@ -6,3 +6,29 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+.search-container {
+    position: relative;
+    width: 300px;
+}
+.dropdown-input[type="text"] {
+    width: 100%;
+    padding: 10px;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    width: 100%;
+    border: 1px solid #ddd;
+    max-height: 150px;
+    overflow-y: auto;
+}
+.dropdown-content a {
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+    color: #333;
+}
+.dropdown-content a:hover {
+    background-color: #ddd;
+}

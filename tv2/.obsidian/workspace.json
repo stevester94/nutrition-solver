@@ -16,7 +16,7 @@
             }
           },
           {
-            "id": "52548ffdbff0c2e1",
+            "id": "41e6360ab9a0facd",
             "type": "leaf",
             "state": {
               "type": "example-view",
@@ -157,7 +157,7 @@
       "nutrition-solver:Activate view": false
     }
   },
-  "active": "52548ffdbff0c2e1",
+  "active": "41e6360ab9a0facd",
   "lastOpenFiles": [
     "Untitled 1.md",
     "script.js",

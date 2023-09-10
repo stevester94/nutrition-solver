@@ -211,37 +211,37 @@ function testQuantityClass() {
     assert( q1.toStr() === "2.3 perflunks" );
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    // Your initialization code here
+// document.addEventListener("DOMContentLoaded", function() {
+//     // Your initialization code here
 
-    // console.log( I_O.getIngredient( "chicken1337" ) )
+//     // console.log( I_O.getIngredient( "chicken1337" ) )
 
-    // console.log( I_O.getUnit( "1337ml" ) )
-    // console.log( I_O.getUnit( "1337kek" ) )
+//     // console.log( I_O.getUnit( "1337ml" ) )
+//     // console.log( I_O.getUnit( "1337kek" ) )
 
-    // console.log( I_O.convertUnits( "g", "oz", 28.3495 ) )
+//     // console.log( I_O.convertUnits( "g", "oz", 28.3495 ) )
 
-    // console.log( I_O.getScalarFromQuantity( "1337.24asdf" ) )
-    // console.log( I_O.getScalarFromQuantity( "asdf" ) )
+//     // console.log( I_O.getScalarFromQuantity( "1337.24asdf" ) )
+//     // console.log( I_O.getScalarFromQuantity( "asdf" ) )
 
-    // // Get references to HTML elements
-    // const searchInput = document.getElementById("searchInput");
-    // const dropdown = document.getElementById("dropdown");
+//     // // Get references to HTML elements
+//     // const searchInput = document.getElementById("searchInput");
+//     // const dropdown = document.getElementById("dropdown");
 
-    // // Event listener to handle item selection
-    dropdown.addEventListener("click", searchClickHandler );
-    searchInput.addEventListener("input", searchInputHandler );
+//     // // Event listener to handle item selection
+//     dropdown.addEventListener("click", searchClickHandler );
+//     searchInput.addEventListener("input", searchInputHandler );
 
-    // addIngredient( "whatever", "slop", "1337ml", 420, 59 )
+//     // addIngredient( "whatever", "slop", "1337ml", 420, 59 )
 
-    // Other initialization tasks
+//     // Other initialization tasks
 
 
-    testQuantityClass()
-});
+//     testQuantityClass()
+// });
 
 export class Ingredient_Omnissiah {
-    private ingredients: Map<string, Object>;
+    public ingredients: Map<string, Object>;
 
     constructor() {
         this.ingredients = new Map();
@@ -289,6 +289,9 @@ export class Solver {
     private calSpan_ : HTMLSpanElement;
     private proSpan_ : HTMLSpanElement;
 
+    private searchInput_ : HTMLInputElement;
+    private dropdown_ : HTMLDivElement;
+
     private totalCals : number;
     private totalProt : number;
 
@@ -296,6 +299,31 @@ export class Solver {
     constructor( top:Element, I_O:Ingredient_Omnissiah ) {
         this.top_ = top;
         this.I_O_ = I_O;
+
+
+        // <h1>Search Ingredients</h1>
+        // <div class="search-container">
+        //     <input class="dropdown-input" type="text" id="searchInput" placeholder="Search...">
+        //     <div class="dropdown-content" id="dropdown">
+        //         <!-- Matching items will be displayed here -->
+        //     </div>
+        // </div>
+
+
+//     
+//     
+
+
+        this.top_.createEl( "h1", { text: "Search Ingredients"} )
+        this.top_.createEl( "div", { cls: "search-container" } )
+        this.searchInput_ = this.top_.createEl( "input", { cls: "dropdown-input", type: "text", placeholder: "Search..." } )
+        this.searchInput_.id = "searchInput";
+        this.searchInput_.addEventListener("input", () => this.searchInputHandler(this) );
+
+        this.dropdown_ = this.top_.createEl( "div", { cls: "dropdown-content", } );
+        this.dropdown_.id = "dropdown";
+        this.dropdown_.addEventListener("click", (e) => this.searchClickHandler(this, e) );
+        // this.dropdown_.addEventListener("click", this.searchClickHandler );
 
         this.top_.createEl( "h1").setText( "Ingredients")
         this.table_ = this.top_.createEl( "table" )
@@ -360,10 +388,7 @@ export class Solver {
 
         this.table_.deleteRow( row.rowIndex )
 
-        console.log( "A", this )
         this.updateTotals();
-        this.calSpan_.textContent = String( this.totalCals )
-        this.proSpan_.textContent = String( this.totalProt )
     }
 
     editHandler( e:Event, row:HTMLTableRowElement ) {
@@ -414,6 +439,50 @@ export class Solver {
 
         // String(caloriesTotal);
         // this.proSpan_.textContent = String(proteinTotal);
+    }
+
+    searchInputHandler( this: Solver ) {
+        // Get I_O items here
+        // console.log( this );
+        // return;
+
+        let items = Array.from( this.I_O_.ingredients.keys() );
+    
+        const inputValue = this.searchInput_.value.toLowerCase();
+        const matchingItems = items.filter(item => item.toLowerCase().includes(inputValue));
+        
+        // Clear the dropdown
+        this.dropdown_.innerHTML = "";
+    
+        // Populate the dropdown with matching items
+        matchingItems.forEach(item => {
+            const listItem = document.createElement("a");
+            listItem.textContent = item;
+            this.dropdown_.appendChild(listItem);
+        });
+    
+        // Show or hide the dropdown based on matching items
+        if (matchingItems.length > 0) {
+            this.dropdown_.style.display = "block";
+        } else {
+            this.dropdown_.style.display = "none";
+        }
+    }
+    
+    searchClickHandler(s:Solver, event:Event,) {
+    // searchClickHandler(event:Event) {
+        // console.log( event.targetNode )
+        console.log( "Event", event )
+        console.log( "currentTarget", event.target )
+        // if (event.target === "A") {
+            let ingredientName = event.target.textContent
+            this.searchInput_.value = ingredientName;
+            this.dropdown_.style.display = "none";
+    
+            let ingredient = s.I_O_.getIngredient( ingredientName );
+    
+            this.addRow( ingredient.ingredientName, ingredient.quantity, ingredient.calories, ingredient.protein );
+        // }
     }
 
 
