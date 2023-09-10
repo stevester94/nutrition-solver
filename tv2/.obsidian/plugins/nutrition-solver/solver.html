@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nutrition Solver</title>
+    <script src="solver.js"></script>
+    <style>
+        /* Styles for the search bar and dropdown */
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+        .dropdown-input[type="text"] {
+            width: 100%;
+            padding: 10px;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            width: 100%;
+            border: 1px solid #ddd;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .dropdown-content a {
+            padding: 10px;
+            text-decoration: none;
+            display: block;
+            color: #333;
+        }
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Ingredients</h1>
+    <div class="search-container">
+        <input class="dropdown-input" type="text" id="searchInput" placeholder="Search...">
+        <div class="dropdown-content" id="dropdown">
+            <!-- Matching items will be displayed here -->
+        </div>
+    </div>
+
+    <h1>Ingredients Table</h1>
+    <table border="1" id="ingredientTable">
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Actions</th>
+            
+        </tr>
+    </table>
+
+    <p>Calories: <span id="caloriesBox"></span></p>
+    <p>Protein: <span id="proteinBox"></span></p>
+</body>
+</html>

@@ -1,5 +1,7 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
+import { Ingredient_Omnissiah, Quantity, Solver } from 'solver';
+
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -284,6 +286,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 export const VIEW_TYPE_EXAMPLE = "example-view";
 
 export class ExampleView extends ItemView {
+    private solver: Solver;
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
   }
@@ -297,9 +300,40 @@ export class ExampleView extends ItemView {
   }
 
   async onOpen() {
+    // this.containerEl.setText( "<h1>test</h1>" );
     const container = this.containerEl.children[1];
-    container.empty();
-    container.createEl("h4", { text: "Well I'll be a son of a bitch" });
+    container.setText( "<h1>asdf</h1>" );
+    // const iframe = container.createEl("iframe");
+    // iframe.title = "Fugg iFrame";
+
+    // iframe.setAttr( "title", "Iframe Example" );
+    // // iframe.setAttr( "src", "https://www.google.com" );
+    // iframe.setAttr( "src", "solver.html" );
+    // iframe.setAttr( "height", "100%" );
+    // iframe.setAttr( "width", "100%" );
+
+    const div = this.containerEl.createDiv();
+    div.setText( "<h1>hehllo</h1>" )
+    div.setText( "fuck" );
+
+    let I_O: Ingredient_Omnissiah = new Ingredient_Omnissiah();
+
+
+    I_O.addIngredient( "Chicken",                   Quantity.fromStr("110g"), 220, 30 );
+    I_O.addIngredient( "Chobani FF Vanilla",        Quantity.fromStr("10 g"), 110, 12 )
+    I_O.addIngredient( "1 Scoop Shake w/ Collagen", Quantity.fromStr("1 scoop"), 165, 35 )
+    I_O.addIngredient( "Bacon, 2 medium slices",    Quantity.fromStr("10 g"), 86, 6 )
+    I_O.addIngredient( "Egg",                       Quantity.fromStr("10  g"), 70, 6 )
+    I_O.addIngredient( "1 cup Grated Cheddar",      Quantity.fromStr("10g"), 480, 24 )
+    I_O.addIngredient( "1 cup heavy cream",         Quantity.fromStr("10g"), 821, 4.9 )
+
+    console.log( I_O );
+    console.log( I_O.getIngredient( "Egg" ) );
+
+    this.solver = new Solver( container, I_O );
+
+    // container.empty();
+    // container.createEl("h4", { text: "Well I'll be a son of a bitch" });
   }
 
   async onClose() {
