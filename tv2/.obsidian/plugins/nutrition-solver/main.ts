@@ -300,6 +300,39 @@ export class ExampleView extends ItemView {
     const container = this.containerEl.children[1];
     container.empty();
     container.createEl("h4", { text: "Well I'll be a son of a bitch" });
+
+    let blockSearchTerm = "```nutrition"
+
+    // https://github.com/obsidianmd/obsidian-api/tree/master
+    for( const f of this.app.vault.getFiles() ) {
+      let metadata = this.app.metadataCache.getFileCache( f )
+      var contents = await this.app.vault.cachedRead(f)
+
+      // So basically we're gonna be reading every file in the vault. IDK how slow that's gonna be
+      // if it's painful, we can use the below to search for a tag, and only scan those
+      // if( metadata.hasOwnProperty("tags") ) {
+      //   console.log( "File", f, " has tags: ", metadata.tags )
+      // }
+      
+
+      // This works
+      if( metadata.hasOwnProperty("sections") ) {
+        for( const section of metadata.sections ) {
+          if( section.type == "code" ) {
+            var block = contents.slice(section.position.start.offset, section.position.end.offset)
+            if( block.startsWith(blockSearchTerm) ) {
+              block = block.slice(blockSearchTerm.length+1, block.length-4) // Take off the ```ingredient\n and ```\n
+              console.log( block )
+              var ingredient = JSON.parse( block )
+              console.log( "Found an ingredient", ingredient )
+            }
+          }
+        }
+      }
+    }
+
+    // this works
+    // console.log( this.app.metadataCache.getCache( "note1.md" ) )
   }
 
   async onClose() {
