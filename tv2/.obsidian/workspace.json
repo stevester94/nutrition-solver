@@ -4,27 +4,67 @@
     "type": "split",
     "children": [
       {
-        "id": "9f2f1f507ee2c430",
+        "id": "e78ed12ffb6733f7",
         "type": "tabs",
         "children": [
           {
-            "id": "d563af746c21ce12",
+            "id": "562fc4bb1686cca5",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "note1.md",
+                "mode": "source",
+                "source": false
+              }
             }
           },
           {
-            "id": "41e6360ab9a0facd",
+            "id": "d7e34cca1b2aed57",
             "type": "leaf",
             "state": {
               "type": "example-view",
               "state": {}
             }
+          },
+          {
+            "id": "338bfee605388cc2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "note1.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "1640ed267c3670f9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "note2.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "6d2ab393b8d1e3b5",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "note2.md",
+                "mode": "source",
+                "source": false
+              }
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -90,6 +130,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "note2.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -106,6 +147,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "note2.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -127,15 +169,19 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "note2.md"
+              }
             }
           },
           {
-            "id": "7bbc8202e7905693",
+            "id": "70ac0b4ca1b8c891",
             "type": "leaf",
             "state": {
-              "type": "example-view",
-              "state": {}
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency"
+              }
             }
           }
         ],
@@ -153,17 +199,16 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "nutrition-solver:Sample Plugin": false,
-      "nutrition-solver:Activate view": false
+      "nutrition-solver:Nutrition Solver": false
     }
   },
-  "active": "41e6360ab9a0facd",
+  "active": "6d2ab393b8d1e3b5",
   "lastOpenFiles": [
+    "note1.md",
+    "note2.md",
     "Untitled 1.md",
     "script.js",
     "index.html",
-    "note1.md",
-    "Untitled.md",
     "Untitled"
   ]
 }

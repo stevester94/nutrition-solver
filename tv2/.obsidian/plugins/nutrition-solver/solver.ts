@@ -333,16 +333,6 @@ export class Solver {
         row.createEl( "th" ).setText( "Calories" )
         row.createEl( "th" ).setText( "Protein" )
         row.createEl( "th" ).setText( "Actions" )
-        
-        let chicken = this.I_O_.getIngredient( "Chicken" )
-
-        this.btn_ = this.top_.createEl( "button" );
-        this.btn_.setText( "My fucking button" );
-        
-        this.btn_.addEventListener( "click", (e) => {
-            this.addRow( chicken.ingredientName, chicken.quantity, chicken.calories, chicken.protein );
-        });
-
 
         let calP = this.top_.createEl("p")
         calP.setText( "Calories: " )
@@ -351,8 +341,6 @@ export class Solver {
         let proP = this.top_.createEl("p")
         proP.setText( "Protein: " )
         this.proSpan_ = proP.createEl( "span");
-
-        this.addRow( chicken.ingredientName, chicken.quantity, chicken.calories, chicken.protein );
     }
 
     addRow( name:string, quantity: Quantity, calories: number, protein: number ) {
@@ -383,8 +371,8 @@ export class Solver {
     }
 
     deleteHandler(e:Event, row:HTMLTableRowElement) {
-        console.log( "deleteHandler");
-        console.log( row );
+        // console.log( "deleteHandler");
+        // console.log( row );
 
         this.table_.deleteRow( row.rowIndex )
 
@@ -401,7 +389,7 @@ export class Solver {
 
         try {
             quant = Quantity.fromStr( cellQuantity.getElementsByTagName('input')[0].value );
-            console.log( "Parsed quantity: ", quant )
+            // console.log( "Parsed quantity: ", quant )
             let scaledIngredient = this.I_O_.scaleIngredient( cellIngredientName.textContent, quant )
             cellCalories.textContent = String(parseFloat(scaledIngredient.calories));
             cellProtein.textContent = String(parseFloat(scaledIngredient.protein));
@@ -414,14 +402,14 @@ export class Solver {
     }
 
     updateTotals() {
-        console.log( "B", this )
+        // console.log( "B", this )
         var caloriesTotal = 0.0;
         var proteinTotal = 0.0;
 
         // i=1, Skip the header row
         for( let i = 1; i < this.table_.rows.length; i++ ) {
             const row = this.table_.rows[i];
-            console.log("adsf", row )
+            // console.log("adsf", row )
 
             var cellIngredientName = row.cells[0];
             var cellQuantity = row.cells[1];
@@ -472,8 +460,8 @@ export class Solver {
     searchClickHandler(s:Solver, event:Event,) {
     // searchClickHandler(event:Event) {
         // console.log( event.targetNode )
-        console.log( "Event", event )
-        console.log( "currentTarget", event.target )
+        // console.log( "Event", event )
+        // console.log( "currentTarget", event.target )
         // if (event.target === "A") {
             let ingredientName = event.target.textContent
             this.searchInput_.value = ingredientName;
