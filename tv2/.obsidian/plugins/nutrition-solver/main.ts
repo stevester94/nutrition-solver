@@ -321,6 +321,8 @@ export class ExampleView extends ItemView {
         continue
 
       if( metadata.hasOwnProperty("sections") ) {
+        if( metadata.sections === undefined) 
+          continue
         for( const section of metadata.sections ) {
           if( section.type == "code" ) {
             var block = contents.slice(section.position.start.offset, section.position.end.offset)
