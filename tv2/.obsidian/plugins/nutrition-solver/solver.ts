@@ -252,7 +252,7 @@ function testQuantityClass() {
 // });
 
 export class Ingredient_Omnissiah {
-    public ingredients: Map<string, Object>;
+    public ingredients: Map<string, Ingredient>;
 
     constructor() {
         this.ingredients = new Map();
@@ -263,18 +263,24 @@ export class Ingredient_Omnissiah {
             throw new Error( `${ingredientName} already exists in Ingredient_Omnissiah` )
         }
 
-        var newIngredient = {
-            ingredientName: ingredientName,
-            quantity: quantity,
-            protein: protein,
-            calories: calories,
-        };
+        var newIngredient = new Ingredient()
+
+        newIngredient.ingredientName = ingredientName
+        newIngredient.quantity = quantity
+        newIngredient.protein = protein
+        newIngredient.calories = calories
+
 
         this.ingredients.set(ingredientName, newIngredient);
     }
 
-    getIngredient( name:string ) {
-        return this.ingredients.get( name );
+    getIngredient( name:string ):Ingredient {
+        let ret = this.ingredients.get( name )
+        if( ret === undefined ) {
+            throw new Error( `couldn't find ingredient ${name}` )
+        } else {
+            return ret
+        }
     }
 
     scaleIngredient( name:string, newQuantity:Quantity ) {
@@ -404,9 +410,11 @@ export class Solver {
         try {
             quant = Quantity.fromStr( cellQuantity.getElementsByTagName('input')[0].value );
             // console.log( "Parsed quantity: ", quant )
-            let scaledIngredient = this.I_O_.scaleIngredient( cellIngredientName.textContent, quant )
-            cellCalories.textContent = String(parseFloat(scaledIngredient.calories));
-            cellProtein.textContent = String(parseFloat(scaledIngredient.protein));
+            if( cellIngredientName.textContent !== null) {
+                let scaledIngredient = this.I_O_.scaleIngredient( cellIngredientName.textContent, quant )
+                cellCalories.textContent = String(parseFloat(scaledIngredient.calories));
+                cellProtein.textContent = String(parseFloat(scaledIngredient.protein));
+            }
         }
         catch( error ) {
             // TODO: Make the cell red or something
@@ -429,9 +437,12 @@ export class Solver {
             var cellQuantity = row.cells[1];
             var cellCalories = row.cells[2];
             var cellProtein = row.cells[3];
+            
+            if( cellCalories.textContent !== null)
+                caloriesTotal += parseFloat(cellCalories.textContent);
 
-            caloriesTotal += parseFloat(cellCalories.textContent);
-            proteinTotal += parseFloat(cellProtein.textContent);
+            if( cellProtein.textContent !== null )
+                proteinTotal += parseFloat(cellProtein.textContent);
         }
 
         this.calSpan_.textContent = String( caloriesTotal )
@@ -443,18 +454,18 @@ export class Solver {
         // this.proSpan_.textContent = String(proteinTotal);
     }
 
-    searchInputHandler( this: Solver ) {
+    searchInputHandler( s: Solver ) {
         // Get I_O items here
         // console.log( this );
         // return;
 
-        let items = Array.from( this.I_O_.ingredients.keys() );
+        let items = Array.from( s.I_O_.ingredients.keys() );
     
-        const inputValue = this.searchInput_.value.toLowerCase();
+        const inputValue = s.searchInput_.value.toLowerCase();
         const matchingItems = items.filter(item => item.toLowerCase().includes(inputValue));
         
         // Clear the dropdown
-        this.dropdown_.innerHTML = "";
+        s.dropdown_.innerHTML = "";
     
         // Populate the dropdown with matching items
         matchingItems.forEach(item => {
@@ -465,9 +476,9 @@ export class Solver {
     
         // Show or hide the dropdown based on matching items
         if (matchingItems.length > 0) {
-            this.dropdown_.style.display = "block";
+            s.dropdown_.style.display = "block";
         } else {
-            this.dropdown_.style.display = "none";
+            s.dropdown_.style.display = "none";
         }
     }
     
