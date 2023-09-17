@@ -316,6 +316,10 @@ export class ExampleView extends ItemView {
       
 
       // This works
+
+      if( metadata === null )
+        continue
+
       if( metadata.hasOwnProperty("sections") ) {
         for( const section of metadata.sections ) {
           if( section.type == "code" ) {
