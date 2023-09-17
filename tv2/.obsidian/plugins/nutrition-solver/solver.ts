@@ -8,6 +8,13 @@
 
 import { ButtonComponent } from "obsidian";
 
+export class Ingredient {
+    public ingredientName:string;
+    public quantity:Quantity;
+    public protein:number;
+    public calories:number;
+}
+
 export class Quantity {
     public value: number;
     public unit: string;
@@ -31,7 +38,7 @@ export class Quantity {
         return q;
     }
 
-    static fromStr( s ) {
+    static fromStr( s:string ) {
         let q = new Quantity();
         q.fromStr( s );
         return q;
@@ -80,7 +87,11 @@ export class Quantity {
     // The ratio from this is used to scale the original ingredient
     getQuantityRatio( otherQuantity:Quantity ) {
         let tempQ = this.convertQuantity( otherQuantity.unit );
-        return otherQuantity.value / tempQ.value;
+
+        if( tempQ === undefined )
+            return -1 //  guard on undefined tempQ
+        else
+            return otherQuantity.value / tempQ.value;
     }
 
     convertQuantity( newUnit:string ) {
@@ -268,6 +279,9 @@ export class Ingredient_Omnissiah {
 
     scaleIngredient( name:string, newQuantity:Quantity ) {
         let ingredient = this.ingredients.get( name );
+        if( ingredient === undefined )
+            return -1
+
         let ratio = ingredient.quantity.getQuantityRatio( newQuantity );
 
         // The absolute state of this shitty fucking language
@@ -463,11 +477,17 @@ export class Solver {
         // console.log( "Event", event )
         // console.log( "currentTarget", event.target )
         // if (event.target === "A") {
+            if( event.target === null )
+                return
+
             let ingredientName = event.target.textContent
             this.searchInput_.value = ingredientName;
             this.dropdown_.style.display = "none";
     
             let ingredient = s.I_O_.getIngredient( ingredientName );
+
+            if( ingredient === undefined )
+                return
     
             this.addRow( ingredient.ingredientName, ingredient.quantity, ingredient.calories, ingredient.protein );
         // }
