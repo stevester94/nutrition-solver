@@ -312,8 +312,11 @@ export class Solver {
     private searchInput_ : HTMLInputElement;
     private dropdown_ : HTMLDivElement;
 
-    private totalCals : number;
-    private totalProt : number;
+    private servingsInput_: HTMLInputElement;
+
+    private calPerServingSpan_ : HTMLSpanElement;
+    private proPerServingSpan_ : HTMLSpanElement;
+
 
 
     constructor( top:Element, I_O:Ingredient_Omnissiah ) {
@@ -355,12 +358,27 @@ export class Solver {
         row.createEl( "th" ).setText( "Actions" )
 
         let calP = this.top_.createEl("p")
-        calP.setText( "Calories: " )
+        calP.setText( "Total Calories: " )
         this.calSpan_ = calP.createEl( "span");
 
         let proP = this.top_.createEl("p")
-        proP.setText( "Protein: " )
+        proP.setText( "Total Protein: " )
         this.proSpan_ = proP.createEl( "span");
+
+        this.top_.createEl( "span" ).setText( "Servings: ")
+        this.servingsInput_ = this.top_.createEl( "input", { type: "text" } )
+        this.servingsInput_.id = "servingsInput"
+        this.servingsInput_.defaultValue = "8"
+        this.servingsInput_.addEventListener( "input", () => this.updateTotals() )
+
+        let calServSpan = this.top_.createEl( "p" )
+        calServSpan.setText( "Calories per serving: " )
+        this.calPerServingSpan_ = calServSpan.createEl( "span" )
+
+        let proServSpan = this.top_.createEl( "p" )
+        proServSpan.setText( "Protein per serving: " )
+        this.proPerServingSpan_ = proServSpan.createEl( "span" )
+
     }
 
     addRow( name:string, quantity: Quantity, calories: number, protein: number ) {
@@ -423,7 +441,7 @@ export class Solver {
         this.updateTotals();
     }
 
-    updateTotals() {
+    updateTotals(this:Solver) {
         // console.log( "B", this )
         var caloriesTotal = 0.0;
         var proteinTotal = 0.0;
@@ -448,10 +466,12 @@ export class Solver {
         this.calSpan_.textContent = String( caloriesTotal )
         this.proSpan_.textContent = String( proteinTotal )
 
-        // this.calSpan_.textContent = "huh"; 
+        if( this.servingsInput_.textContent !== null ) {
+            let nServings = parseFloat( this.servingsInput_.value )
 
-        // String(caloriesTotal);
-        // this.proSpan_.textContent = String(proteinTotal);
+            this.calPerServingSpan_.textContent = String( caloriesTotal / nServings )
+            this.proPerServingSpan_.textContent = String( proteinTotal / nServings )
+        }
     }
 
     searchInputHandler( s: Solver ) {
