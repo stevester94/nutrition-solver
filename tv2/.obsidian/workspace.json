@@ -57,14 +57,22 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "note2.md",
+                "file": "note1.md",
                 "mode": "source",
                 "source": false
               }
             }
+          },
+          {
+            "id": "df7b343835c9ff03",
+            "type": "leaf",
+            "state": {
+              "type": "example-view",
+              "state": {}
+            }
           }
         ],
-        "currentTab": 4
+        "currentTab": 5
       }
     ],
     "direction": "vertical"
@@ -130,7 +138,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "note2.md",
+                "file": "note1.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -147,7 +155,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "note2.md",
+                "file": "note1.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -170,7 +178,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "note2.md"
+                "file": "note1.md"
               }
             }
           },
@@ -202,10 +210,10 @@
       "nutrition-solver:Nutrition Solver": false
     }
   },
-  "active": "6d2ab393b8d1e3b5",
+  "active": "df7b343835c9ff03",
   "lastOpenFiles": [
-    "note1.md",
     "note2.md",
+    "note1.md",
     "Untitled 1.md",
     "script.js",
     "index.html",

@@ -482,16 +482,21 @@ export class Solver {
         }
     }
     
-    searchClickHandler(s:Solver, event:Event,) {
+    searchClickHandler(s:Solver, event:MouseEvent,) {
     // searchClickHandler(event:Event) {
         // console.log( event.targetNode )
         // console.log( "Event", event )
         // console.log( "currentTarget", event.target )
         // if (event.target === "A") {
-            if( event.target === null )
+            if( event.targetNode === null )
                 return
 
-            let ingredientName = event.target.textContent
+            // event.targetNode.tex``
+            let ingredientName = event.targetNode.textContent
+
+            if( ingredientName === null )
+                return
+
             this.searchInput_.value = ingredientName;
             this.dropdown_.style.display = "none";
     
