@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "a2b994156ea96848",
+        "id": "26c176318754fd49",
         "type": "tabs",
         "children": [
           {
-            "id": "7189157880faf785",
+            "id": "6e061a6422efd69b",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -16,7 +16,7 @@
             }
           },
           {
-            "id": "99eca17409a6e59d",
+            "id": "b65f57078eb20248",
             "type": "leaf",
             "state": {
               "type": "example-view",
@@ -24,7 +24,7 @@
             }
           },
           {
-            "id": "b138c23ca4ff66a8",
+            "id": "8ba3d67d9f62ee89",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -36,7 +36,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -102,7 +102,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "note1.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,7 +118,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "note1.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -141,9 +139,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "note1.md"
-              }
+              "state": {}
             }
           },
           {
@@ -174,7 +170,7 @@
       "nutrition-solver:Nutrition Solver": false
     }
   },
-  "active": "b138c23ca4ff66a8",
+  "active": "b65f57078eb20248",
   "lastOpenFiles": [
     "note1.md",
     "note2.md",
