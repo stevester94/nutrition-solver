@@ -1,4 +1,4 @@
 ```ingredient
-{ "name": "slop", "calories": 100, "protein": 20, "quantity": "20g" }
+{ "name": "slop", "calories": 100, "protein": 10, "quantity": "20kg" }
 ```
 

@@ -1,8 +1,8 @@
 ```ingredient
-{ "name": "chicken", "calories": 100, "protein": 20, "quantity": "20g" }
+{ "name": "chicken", "calories": 220, "protein": 30, "quantity": "216g" }
 ```
 
 ```ingredient
-{ "name": "steak", "calories": 100, "protein": 20, "quantity": "20g" }
+{ "name": "steak", "calories": 500, "protein": 30, "quantity": "10oz" }
 ```
 

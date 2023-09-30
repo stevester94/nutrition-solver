@@ -14,18 +14,47 @@ export class Ingredient {
     public quantity:Quantity;
     public protein:number;
     public calories:number;
+
+    scale( newQuantity:Quantity ) {
+        let ratio = this.quantity.getQuantityRatio( newQuantity );
+
+        this.quantity = newQuantity
+        this.protein *= ratio
+        this.calories *= ratio
+    }
 }
 
 class Recipe {
     public ingredients:Array<Ingredient>
     public numServings:number
-    public caloriesPerServing:number
-    public proteinPerServing:number
-    public caloriesTotal:number
-    public proteinTotal:number
 
     constructor() {
         this.ingredients = []
+    }
+
+    totalCalories():number {
+        let cals = 0.0
+        this.ingredients.forEach( ing=> {
+            cals += ing.calories
+        })
+        return cals
+    }
+
+    totalProtein():number {
+        let pro = 0.0
+        this.ingredients.forEach( ing => {
+            pro += ing.protein
+        })
+
+        return pro
+    }
+
+    caloriesPerServing():number {
+        return this.totalCalories()/this.numServings
+    }
+
+    proteinPerServing():number {
+        return this.totalProtein()/this.numServings
     }
 }
 
@@ -296,24 +325,6 @@ export class Ingredient_Omnissiah {
             return ret
         }
     }
-
-    scaleIngredient( name:string, newQuantity:Quantity ):Ingredient {
-        let ingredient = this.ingredients.get( name );
-        if(ingredient === null || ingredient === undefined)
-            throw Error("Couldnt get the ingredient")
-            
-
-        let ratio = ingredient.quantity.getQuantityRatio( newQuantity );
-
-        // The absolute state of this shitty fucking language
-        var scaled = JSON.parse(JSON.stringify(ingredient));
-
-        scaled.quantity = newQuantity;
-        scaled.protein *= ratio;
-        scaled.calories *= ratio;
-
-        return scaled;
-    }
 }
 
 export class Solver {
@@ -334,23 +345,14 @@ export class Solver {
 
     private recipeJson_ : HTMLTextAreaElement
 
+    private recipe_ : Recipe
+
 
     constructor( top:Element, I_O:Ingredient_Omnissiah ) {
         this.top_ = top;
         this.I_O_ = I_O;
-
-
-        // <h1>Search Ingredients</h1>
-        // <div class="search-container">
-        //     <input class="dropdown-input" type="text" id="searchInput" placeholder="Search...">
-        //     <div class="dropdown-content" id="dropdown">
-        //         <!-- Matching items will be displayed here -->
-        //     </div>
-        // </div>
-
-
-//     
-//     
+        this.recipe_ = new Recipe()
+        this.recipe_.numServings = 8
 
 
         this.top_.createEl( "h1", { text: "Search Ingredients"} )
@@ -384,8 +386,8 @@ export class Solver {
         this.top_.createEl( "span" ).setText( "Servings: ")
         this.servingsInput_ = this.top_.createEl( "input", { type: "text" } )
         this.servingsInput_.id = "servingsInput"
-        this.servingsInput_.defaultValue = "8"
-        this.servingsInput_.addEventListener( "input", () => this.updateTotals() )
+        this.servingsInput_.defaultValue = String(this.recipe_.numServings);
+        // this.servingsInput_.addEventListener( "input", () => this.updateTotals() ) // BROKEN
 
         let calServSpan = this.top_.createEl( "p" )
         calServSpan.setText( "Calories per serving: " )
@@ -396,8 +398,28 @@ export class Solver {
         this.proPerServingSpan_ = proServSpan.createEl( "span" )
 
         this.recipeJson_ = this.top_.createEl( "textarea" )
-        this.recipeJson_.addEventListener( "input", () => this.textAreaEditHandler() )
+        // this.recipeJson_.addEventListener( "input", () => this.textAreaEditHandler() ) // BROKEN
 
+    }
+
+    buildTable() {
+        console.log( "BUILD" )
+        console.log(this.recipe_.ingredients)
+
+        console.log( "Building, this.table_.rows.length:", this.table_.rows.length)
+        while( this.table_.rows.length > 1) {
+            this.table_.deleteRow( 1 )
+        }
+
+        this.recipe_.ingredients.forEach( ing => {
+            this.addRow( ing.name, ing.quantity, ing.calories, ing.protein )
+        })
+
+        this.calSpan_.textContent = String( this.recipe_.totalCalories() )
+        this.proSpan_.textContent = String( this.recipe_.totalProtein() )
+
+        this.calPerServingSpan_.textContent = String( this.recipe_.caloriesPerServing() )
+        this.proPerServingSpan_.textContent = String( this.recipe_.proteinPerServing()  )
     }
 
     addRow( name:string, quantity: Quantity, calories: number, protein: number ) {
@@ -423,135 +445,93 @@ export class Solver {
         let delBtn = actions.createEl("button");
         delBtn.setText( "Delete" )
         delBtn.addEventListener( "click", (e) => this.deleteHandler(e, row) )
-
-        this.updateTotals();
     }
 
     deleteHandler(e:Event, row:HTMLTableRowElement) {
-        // console.log( "deleteHandler");
-        // console.log( row );
-
-        this.table_.deleteRow( row.rowIndex )
-
-        this.updateTotals();
+        console.log( "Delete idx", row.rowIndex-1 )
+        this.recipe_.ingredients.splice( row.rowIndex-1, 1 ) // -1 because of the header
+        this.buildTable()
     }
 
     editHandler( e:Event, row:HTMLTableRowElement ) {
-        var cellIngredientName = row.cells[0];
-        var cellQuantity = row.cells[1];
-        var cellCalories = row.cells[2];
-        var cellProtein = row.cells[3];
+        // var cellIngredientName = row.cells[0];
+        // var cellQuantity = row.cells[1];
+        // var cellCalories = row.cells[2];
+        // var cellProtein = row.cells[3];
 
-        let quant = null;
+        // let quant = null;
 
-        try {
-            quant = Quantity.fromStr( cellQuantity.getElementsByTagName('input')[0].value );
-            // console.log( "Parsed quantity: ", quant )
-            if( cellIngredientName.textContent !== null) {
-                let scaledIngredient = this.I_O_.scaleIngredient( cellIngredientName.textContent, quant )
-                cellCalories.textContent = String(scaledIngredient.calories);
-                cellProtein.textContent = String(scaledIngredient.protein);
-            }
-        }
-        catch( error ) {
-            // TODO: Make the cell red or something
-        }
+        // try {
+        //     quant = Quantity.fromStr( cellQuantity.getElementsByTagName('input')[0].value );
+        //     // console.log( "Parsed quantity: ", quant )
+        //     if( cellIngredientName.textContent !== null) {
+        //         let scaledIngredient = this.I_O_.scaleIngredient( cellIngredientName.textContent, quant )
+        //         cellCalories.textContent = String(scaledIngredient.calories);
+        //         cellProtein.textContent = String(scaledIngredient.protein);
+        //     }
+        // }
+        // catch( error ) {
+        //     // TODO: Make the cell red or something
+        // }
 
-        this.updateTotals();
+        // this.updateTotals();
     }
 
-    updateTotals(this:Solver, updateJson=true) {
-        console.log( "Updating" )
-        var caloriesTotal = 0.0;
-        var proteinTotal = 0.0;
-        let nServings = 1
+    // buildRecipe( caloriesTotal:number, proteinTotal:number, numServings:number ):string {
+    //     let recipe = new Recipe
+    //     for( let i = 1; i < this.table_.rows.length; i++ ) {
+    //         const row = this.table_.rows[i];
+    //         // console.log("adsf", row )
 
-        // i=1, Skip the header row
-        for( let i = 1; i < this.table_.rows.length; i++ ) {
-            const row = this.table_.rows[i];
-            // console.log("adsf", row )
-
-            var cellIngredientName = row.cells[0];
-            var cellQuantity = row.cells[1];
-            var cellCalories = row.cells[2];
-            var cellProtein = row.cells[3];
+    //         var ingredientName = row.cells[0].textContent;
+    //         var quantity = row.cells[1].getElementsByTagName('input')[0].value;
+    //         var calories = row.cells[2].textContent;
+    //         var protein = row.cells[3].textContent;
             
-            if( cellCalories.textContent !== null)
-                caloriesTotal += parseFloat(cellCalories.textContent);
+    //         // { "name": "chicken", "calories": 100, "protein": 20, "quantity": "20g" }
+    //         if( ingredientName !== null )
+    //         {
+    //             recipe.ingredients.push(
+    //                 this.I_O_.scaleIngredient( ingredientName, Quantity.fromStr( quantity ))
+    //             )
+    //         }
+    //     }
 
-            if( cellProtein.textContent !== null )
-                proteinTotal += parseFloat(cellProtein.textContent);
-        }
+    //     recipe.caloriesTotal = caloriesTotal
+    //     recipe.proteinTotal = proteinTotal
+    //     recipe.proteinPerServing = proteinTotal/numServings
+    //     recipe.caloriesPerServing = caloriesTotal/numServings
+    //     recipe.numServings = numServings
 
-        this.calSpan_.textContent = String( caloriesTotal )
-        this.proSpan_.textContent = String( proteinTotal )
+    //     return JSON.stringify( recipe )
+    // }
 
-        if( this.servingsInput_.textContent !== null ) {
-            nServings = parseFloat( this.servingsInput_.value )
+    // loadFromRecipe( recipe:Recipe ) {
+    //     for( let i = 1; i < this.table_.rows.length; i++ ) {
+    //         this.table_.deleteRow( i )
+    //     }
 
-            this.calPerServingSpan_.textContent = String( caloriesTotal / nServings )
-            this.proPerServingSpan_.textContent = String( proteinTotal / nServings )
-        }
+    //     recipe.ingredients.forEach( ingredient => {
+    //         let ing = this.I_O_.scaleIngredient( ingredient.name, ingredient.quantity )
+    //         this.addRow( ing.name, ing.quantity, ing.calories, ing.protein );
+    //     })
+    // }
 
-        if(updateJson)
-            this.recipeJson_.value = this.buildRecipe( caloriesTotal, proteinTotal, nServings )
-    }
+    // textAreaEditHandler() {
+    //     // Parse out recipe then load it
+    //     let recipe = new Recipe()
+    //     let j = []
+    //     try {
+    //         j = JSON.parse( this.recipeJson_.value )
+    //         recipe = j
+    //         this.loadFromRecipe( recipe )
+    //     } catch( erro ) {
+    //         // TODO: Turn the recipe box red
+    //         return
+    //     }
 
-    buildRecipe( caloriesTotal:number, proteinTotal:number, numServings:number ):string {
-        let recipe = new Recipe
-        for( let i = 1; i < this.table_.rows.length; i++ ) {
-            const row = this.table_.rows[i];
-            // console.log("adsf", row )
-
-            var ingredientName = row.cells[0].textContent;
-            var quantity = row.cells[1].getElementsByTagName('input')[0].value;
-            var calories = row.cells[2].textContent;
-            var protein = row.cells[3].textContent;
-            
-            // { "name": "chicken", "calories": 100, "protein": 20, "quantity": "20g" }
-            if( ingredientName !== null )
-            {
-                recipe.ingredients.push(
-                    this.I_O_.scaleIngredient( ingredientName, Quantity.fromStr( quantity ))
-                )
-            }
-        }
-
-        recipe.caloriesTotal = caloriesTotal
-        recipe.proteinTotal = proteinTotal
-        recipe.proteinPerServing = proteinTotal/numServings
-        recipe.caloriesPerServing = caloriesTotal/numServings
-        recipe.numServings = numServings
-
-        return JSON.stringify( recipe )
-    }
-
-    loadFromRecipe( recipe:Recipe ) {
-        for( let i = 1; i < this.table_.rows.length; i++ ) {
-            this.table_.deleteRow( i )
-        }
-
-        recipe.ingredients.forEach( ingredient => {
-            let ing = this.I_O_.scaleIngredient( ingredient.name, ingredient.quantity )
-            this.addRow( ing.name, ing.quantity, ing.calories, ing.protein );
-        })
-    }
-
-    textAreaEditHandler() {
-        // Parse out recipe then load it
-        let recipe = new Recipe()
-        let j = []
-        try {
-            j = JSON.parse( this.recipeJson_.value )
-            recipe = j
-            this.loadFromRecipe( recipe )
-        } catch( erro ) {
-            // TODO: Turn the recipe box red
-            return
-        }
-
-        // this.updateTotals(false)
-    }
+    //     // this.updateTotals(false)
+    // }
 
     searchInputHandler( s: Solver ) {
         // Get I_O items here
@@ -604,7 +584,9 @@ export class Solver {
             if( ingredient === undefined )
                 return
     
-            this.addRow( ingredient.name, ingredient.quantity, ingredient.calories, ingredient.protein );
+            this.recipe_.ingredients.push( ingredient )
+
+            this.buildTable()
         // }
     }
 

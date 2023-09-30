@@ -16,7 +16,7 @@
             }
           },
           {
-            "id": "b65f57078eb20248",
+            "id": "1e02a7376793f369",
             "type": "leaf",
             "state": {
               "type": "example-view",
@@ -25,6 +25,18 @@
           },
           {
             "id": "8ba3d67d9f62ee89",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "note1.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "3ae0aeb6efb862b1",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -170,7 +182,7 @@
       "nutrition-solver:Nutrition Solver": false
     }
   },
-  "active": "b65f57078eb20248",
+  "active": "1e02a7376793f369",
   "lastOpenFiles": [
     "note1.md",
     "note2.md",
