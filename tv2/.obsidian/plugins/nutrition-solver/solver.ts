@@ -24,12 +24,61 @@ export class Ingredient {
     }
 }
 
+class IngStr {
+    // IDK what I'm doing, to make typescript happy I made this class with quantity as a string
+    public name:string;
+    public quantity:string;
+    public protein:number;
+    public calories:number;
+
+    constructor( ing:Ingredient ) {
+        this.name = ing.name
+        this.quantity = ing.quantity.toStr()
+        this.protein = ing.protein
+        this.calories = ing.calories
+    }
+}
+
 class Recipe {
     public ingredients:Array<Ingredient>
     public numServings:number
 
     constructor() {
         this.ingredients = []
+    }
+
+    static fromJsonString( s:string, i_o:Ingredient_Omnissiah ):Recipe {
+        let j = JSON.parse( s )
+        let r = new Recipe()
+        
+        r.numServings = j.numServings
+        for( let i = 0; i < j.ingredients.length; i++ ) {
+            console.log( j.ingredients[i] )
+            let ing = i_o.getIngredient( j.ingredients[i].name )
+            let quant = Quantity.fromStr( j.ingredients[i].quantity )
+            ing.scale( quant )
+
+            r.ingredients.push( ing )
+        }
+
+        return r
+    }
+
+    toJsonString():string {
+        let j = {
+            numServings: this.numServings,
+            totalProtein: this.totalProtein(),
+            totalCalories: this.totalCalories(),
+            caloriesPerServing: this.caloriesPerServing(),
+            proteinPerServing: this.proteinPerServing(),
+            ingredients: new Array<IngStr>()
+        }
+
+        this.ingredients.forEach( ing=> {
+            j.ingredients.push( new IngStr(ing) )
+        })
+
+        return JSON.stringify( j )
     }
 
     totalCalories():number {
@@ -387,7 +436,7 @@ export class Solver {
         this.servingsInput_ = this.top_.createEl( "input", { type: "text" } )
         this.servingsInput_.id = "servingsInput"
         this.servingsInput_.defaultValue = String(this.recipe_.numServings);
-        // this.servingsInput_.addEventListener( "input", () => this.updateTotals() ) // BROKEN
+        this.servingsInput_.addEventListener( "input", () => this.servingInputHandler() )
 
         let calServSpan = this.top_.createEl( "p" )
         calServSpan.setText( "Calories per serving: " )
@@ -398,28 +447,56 @@ export class Solver {
         this.proPerServingSpan_ = proServSpan.createEl( "span" )
 
         this.recipeJson_ = this.top_.createEl( "textarea" )
-        // this.recipeJson_.addEventListener( "input", () => this.textAreaEditHandler() ) // BROKEN
+        this.recipeJson_.addEventListener( "input", () => this.textAreaEditHandler() ) // BROKEN
 
     }
 
-    buildTable() {
+    buildTable( totalRebuild=false ) {
         console.log( "BUILD" )
-        console.log(this.recipe_.ingredients)
 
-        console.log( "Building, this.table_.rows.length:", this.table_.rows.length)
-        while( this.table_.rows.length > 1) {
-            this.table_.deleteRow( 1 )
+        totalRebuild = (this.recipe_.ingredients.length != this.table_.rows.length-1)
+
+        if( totalRebuild ) {
+            // Clear the table (except the header)
+            while( this.table_.rows.length > 1) {
+                this.table_.deleteRow( 1 )
+            }
+
+            this.recipe_.ingredients.forEach( ing => {
+                this.addRow( ing.name, ing.quantity, ing.calories, ing.protein )
+            })
+        } else {
+            for( let i=1; i < this.table_.rows.length; i++ ) {
+                let curIng = this.recipe_.ingredients[i-1] // because of header
+                let row = this.table_.rows[i]
+
+                let ingredientNameCell = row.cells[0];
+                // let quantityCell = row.cells[1].getElementsByTagName('input')[0].value;
+                let caloriesCell = row.cells[2];
+                let proteinCell = row.cells[3];
+
+                if( ingredientNameCell.textContent !== curIng.name ) {
+                    alert( "The table is fucked" )
+                    return
+                }
+
+                caloriesCell.textContent = String(curIng.calories)
+                proteinCell.textContent  = String(curIng.protein)
+
+
+            }
         }
 
-        this.recipe_.ingredients.forEach( ing => {
-            this.addRow( ing.name, ing.quantity, ing.calories, ing.protein )
-        })
+
+        this.servingsInput_.value = String( this.recipe_.numServings )
 
         this.calSpan_.textContent = String( this.recipe_.totalCalories() )
         this.proSpan_.textContent = String( this.recipe_.totalProtein() )
 
         this.calPerServingSpan_.textContent = String( this.recipe_.caloriesPerServing() )
         this.proPerServingSpan_.textContent = String( this.recipe_.proteinPerServing()  )
+
+        this.recipeJson_.value = this.recipe_.toJsonString()
     }
 
     addRow( name:string, quantity: Quantity, calories: number, protein: number ) {
@@ -448,33 +525,39 @@ export class Solver {
     }
 
     deleteHandler(e:Event, row:HTMLTableRowElement) {
-        console.log( "Delete idx", row.rowIndex-1 )
         this.recipe_.ingredients.splice( row.rowIndex-1, 1 ) // -1 because of the header
         this.buildTable()
     }
 
+    servingInputHandler() {
+        console.log( "servings", this.servingsInput_.value )
+        this.recipe_.numServings = parseInt( this.servingsInput_.value )
+        this.buildTable()
+    }
+
     editHandler( e:Event, row:HTMLTableRowElement ) {
-        // var cellIngredientName = row.cells[0];
-        // var cellQuantity = row.cells[1];
-        // var cellCalories = row.cells[2];
-        // var cellProtein = row.cells[3];
+        var cellIngredientName = row.cells[0];
+        var cellQuantity = row.cells[1];
+        var cellCalories = row.cells[2];
+        var cellProtein = row.cells[3];
 
-        // let quant = null;
+        let quant = null;
 
-        // try {
-        //     quant = Quantity.fromStr( cellQuantity.getElementsByTagName('input')[0].value );
-        //     // console.log( "Parsed quantity: ", quant )
-        //     if( cellIngredientName.textContent !== null) {
-        //         let scaledIngredient = this.I_O_.scaleIngredient( cellIngredientName.textContent, quant )
-        //         cellCalories.textContent = String(scaledIngredient.calories);
-        //         cellProtein.textContent = String(scaledIngredient.protein);
-        //     }
-        // }
-        // catch( error ) {
-        //     // TODO: Make the cell red or something
-        // }
+        try {
+            quant = Quantity.fromStr( cellQuantity.getElementsByTagName('input')[0].value );
+            // console.log( "Parsed quantity: ", quant )
+            if( cellIngredientName.textContent !== null) {
 
-        // this.updateTotals();
+                let scaledIngredient = this.I_O_.getIngredient( cellIngredientName.textContent )
+                scaledIngredient.scale( quant )
+                this.recipe_.ingredients[row.rowIndex-1] = scaledIngredient
+            }
+        }
+        catch( error ) {
+            // TODO: Make the cell red or something
+        }
+
+        this.buildTable()
     }
 
     // buildRecipe( caloriesTotal:number, proteinTotal:number, numServings:number ):string {
@@ -517,21 +600,18 @@ export class Solver {
     //     })
     // }
 
-    // textAreaEditHandler() {
-    //     // Parse out recipe then load it
-    //     let recipe = new Recipe()
-    //     let j = []
-    //     try {
-    //         j = JSON.parse( this.recipeJson_.value )
-    //         recipe = j
-    //         this.loadFromRecipe( recipe )
-    //     } catch( erro ) {
-    //         // TODO: Turn the recipe box red
-    //         return
-    //     }
+    textAreaEditHandler() {
+        // Parse out recipe then load it
+        try {
+            this.recipe_ = Recipe.fromJsonString( this.recipeJson_.value, this.I_O_ )
+        } catch( error ) {
+            console.log( error )
+            // TODO: Turn the recipe box red or report the error some how
+            return
+        }
 
-    //     // this.updateTotals(false)
-    // }
+        this.buildTable()
+    }
 
     searchInputHandler( s: Solver ) {
         // Get I_O items here
