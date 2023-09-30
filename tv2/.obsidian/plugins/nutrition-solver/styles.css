@@ -32,3 +32,13 @@ If your plugin does not need CSS, delete this file.
 .dropdown-content a:hover {
     background-color: #ddd;
 }
+
+.recipe-json {
+    width: 70%;
+    height: 20%;
+}
+
+.debug-box {
+    width: 70%;
+    height: 10%;
+}

@@ -416,6 +416,7 @@ export class Solver {
     private proPerServingSpan_ : HTMLSpanElement;
 
     private recipeJson_ : HTMLTextAreaElement
+    private debugText_ : HTMLTextAreaElement
 
     private recipe_ : Recipe
 
@@ -469,8 +470,16 @@ export class Solver {
         proServSpan.setText( "Protein per serving: " )
         this.proPerServingSpan_ = proServSpan.createEl( "span" )
 
+        this.top_.createEl( "br" )
+        this.top_.createEl( "p" ).setText( "Recipe JSON:")
         this.recipeJson_ = this.top_.createEl( "textarea" )
-        this.recipeJson_.addEventListener( "input", () => this.textAreaEditHandler() ) // BROKEN
+        this.recipeJson_.addEventListener( "input", () => this.textAreaEditHandler() )
+        this.recipeJson_.addClass( "recipe-json" )
+
+        this.top_.createEl( "br" )
+        this.top_.createEl( "p" ).setText( "Debug:")
+        this.debugText_ = this.top_.createEl( "textarea" )
+        this.debugText_.addClass( "debug-box" )
 
     }
 
@@ -519,7 +528,12 @@ export class Solver {
         this.calPerServingSpan_.textContent = String( this.recipe_.caloriesPerServing() )
         this.proPerServingSpan_.textContent = String( this.recipe_.proteinPerServing()  )
 
-        this.recipeJson_.value = this.recipe_.toJsonString()
+        // Update json box only if it doesnt match (currently broken)
+        let j = this.recipe_.toJsonString()
+        if( this.recipeJson_.value !== j)
+            this.recipeJson_.value = this.recipe_.toJsonString()
+
+        this.debugText_.value = ""
     }
 
     addRow( name:string, quantity: Quantity, calories: number, protein: number ) {
@@ -579,13 +593,13 @@ export class Solver {
                 console.log( "scaled", scaledIngredient )
                 this.recipe_.ingredients[row.rowIndex-1] = scaledIngredient
             }
+
+            this.buildTable()
         }
         catch( error ) {
             console.log( error )
-            // TODO: Make the cell red or something
+            this.debugText_.value = String(error)
         }
-
-        this.buildTable()
     }
 
     // buildRecipe( caloriesTotal:number, proteinTotal:number, numServings:number ):string {
@@ -632,13 +646,11 @@ export class Solver {
         // Parse out recipe then load it
         try {
             this.recipe_ = Recipe.fromJsonString( this.recipeJson_.value, this.I_O_ )
+            this.buildTable()
         } catch( error ) {
             console.log( error )
-            // TODO: Turn the recipe box red or report the error some how
-            return
+            this.debugText_.value = String(error)
         }
-
-        this.buildTable()
     }
 
     searchInputHandler( s: Solver ) {
