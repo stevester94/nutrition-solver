@@ -66,11 +66,11 @@ class Recipe {
 
     toJsonString():string {
         let j = {
+            caloriesPerServing: this.caloriesPerServing(),
+            proteinPerServing: this.proteinPerServing(),
             numServings: this.numServings,
             totalProtein: this.totalProtein(),
             totalCalories: this.totalCalories(),
-            caloriesPerServing: this.caloriesPerServing(),
-            proteinPerServing: this.proteinPerServing(),
             ingredients: new Array<IngStr>()
         }
 
@@ -78,7 +78,7 @@ class Recipe {
             j.ingredients.push( new IngStr(ing) )
         })
 
-        return JSON.stringify( j )
+        return JSON.stringify( j, null, 2 )
     }
 
     totalCalories():number {
