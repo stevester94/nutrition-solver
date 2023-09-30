@@ -9,6 +9,8 @@
 import { ButtonComponent } from "obsidian";
 import { resourceUsage } from "process";
 
+var _ = require('lodash');
+
 export class Ingredient {
     public name:string;
     public quantity:Quantity;
@@ -38,6 +40,27 @@ class IngStr {
         this.calories = ing.calories
     }
 }
+
+// The absolute state of js
+// It does not ship with a copy/clone function
+// function clone<T>(obj: T): T {
+//     if (typeof obj !== 'object' || obj === null) {
+//         return obj; // If obj is not an object, return it as is
+//     }
+
+//     if (Array.isArray(obj)) {
+//         return obj.map((item) => clone(item)) as any;
+//     }
+
+//     const newObj: any = {};
+//     for (const key in obj) {
+//         if (obj.hasOwnProperty(key)) {
+//             newObj[key] = clone(obj[key]);
+//         }
+//     }
+
+//     return newObj as T;
+// }
 
 class Recipe {
     public ingredients:Array<Ingredient>
@@ -69,8 +92,8 @@ class Recipe {
             caloriesPerServing: this.caloriesPerServing(),
             proteinPerServing: this.proteinPerServing(),
             numServings: this.numServings,
-            totalProtein: this.totalProtein(),
             totalCalories: this.totalCalories(),
+            totalProtein: this.totalProtein(),
             ingredients: new Array<IngStr>()
         }
 
@@ -371,7 +394,7 @@ export class Ingredient_Omnissiah {
         if( ret === undefined ) {
             throw new Error( `couldn't find ingredient ${name}` )
         } else {
-            return ret
+            return _.cloneDeep(ret)
         }
     }
 }
@@ -452,7 +475,7 @@ export class Solver {
     }
 
     buildTable( totalRebuild=false ) {
-        console.log( "BUILD" )
+        console.log( "BUILD", this.recipe_.ingredients )
 
         totalRebuild = (this.recipe_.ingredients.length != this.table_.rows.length-1)
 
@@ -535,6 +558,8 @@ export class Solver {
         this.buildTable()
     }
 
+
+    
     editHandler( e:Event, row:HTMLTableRowElement ) {
         var cellIngredientName = row.cells[0];
         var cellQuantity = row.cells[1];
@@ -548,12 +573,15 @@ export class Solver {
             // console.log( "Parsed quantity: ", quant )
             if( cellIngredientName.textContent !== null) {
 
+                // let scaledIngredient = clone( this.I_O_.getIngredient( cellIngredientName.textContent ) )
                 let scaledIngredient = this.I_O_.getIngredient( cellIngredientName.textContent )
                 scaledIngredient.scale( quant )
+                console.log( "scaled", scaledIngredient )
                 this.recipe_.ingredients[row.rowIndex-1] = scaledIngredient
             }
         }
         catch( error ) {
+            console.log( error )
             // TODO: Make the cell red or something
         }
 
